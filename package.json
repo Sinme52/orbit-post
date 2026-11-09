@@ -1,0 +1,13 @@
+{
+  "name": "orbit-post",
+  "version": "1.0.0",
+  "description": "Game Boy-style 160x144 4-shade 3D space courier game",
+  "private": true,
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node test/playthrough.js"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}

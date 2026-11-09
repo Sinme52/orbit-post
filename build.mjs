@@ -1,7 +1,7 @@
 // Builds a standalone release of Orbit Post: dist/orbit-post/ and dist/orbit-post.zip.
 // index.html in this folder is written as a page fragment (no <html>/<head>/<body>) so it can be
 // published as a claude.ai Artifact; this script wraps it into a complete HTML document.
-// Usage: node orbit-post/build.mjs
+// Usage: node build.mjs
 import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';

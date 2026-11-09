@@ -1,6 +1,6 @@
 // Playthrough test: a naive pilot that only follows the on-screen marker plays every stage
 // through real key events and the real update loop (simulated clock, no teleporting).
-// Usage: node orbit-post/test/playthrough.js [unlocked stages to start with, default 1]
+// Usage: node test/playthrough.js [unlocked stages to start with, default 1]
 // Needs Playwright with Chromium. Prints every dock arrival with the fuel left in the tank,
 // every lost ship, a per-stage summary, and exits non-zero if the ending is not reached.
 const { chromium } = require('playwright');
