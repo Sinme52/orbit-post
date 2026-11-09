@@ -16,6 +16,7 @@ Game Boy 風の 160×144・4階調画面で、コックピット視点の宇宙�
 | `build.mjs` | 公開用の完全な HTML と zip を `dist/` に作るスクリプト |
 | `test/playthrough.js` | 全ステージを自動操縦で通しプレイするテスト |
 | `package.json` | `npm run build` / `npm test` の定義（テストには Playwright を使う） |
+| `LICENSE` | MIT ライセンス |
 
 ## ステージ
 各ステージで 3 件配達するとクリアし、ワープで次の星系へ進みます。行ったことのある
@@ -70,7 +71,7 @@ Game Boy 風の 160×144・4階調画面で、コックピット視点の宇宙�
 node build.mjs        # または npm run build
 ```
 
-- `dist/orbit-post.zip`：`index.html` と `README.txt` をルートに置いた zip。itch.io（HTML プロジェクト）にそのままアップロードできる
+- `dist/orbit-post.zip`：`index.html`・`README.txt`・`LICENSE.txt` をルートに置いた zip。itch.io（HTML プロジェクト）にそのままアップロードできる
 - `dist/orbit-post/`：同じ中身のフォルダ。GitHub Pages や Netlify などに置くだけで動く
 
 ## GitHub Pages での公開
@@ -94,3 +95,6 @@ node test/playthrough.js     # または npm test
 ```bash
 ORBIT_PAGE=http://127.0.0.1:8765/ node test/playthrough.js
 ```
+
+## ライセンス
+[MIT License](LICENSE) © 2026 Sinme52

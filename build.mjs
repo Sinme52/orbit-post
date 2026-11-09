@@ -75,6 +75,9 @@ Game Boy 風の 160×144・4階調画面で、コックピット視点の宇宙�
   - ページの説明文の書体は Google Fonts から読み込みます。オフラインでは別の書体で表示されますが、
     ゲーム画面には影響しません。
   - 行ったステージ・画面の色・BGM 設定はブラウザに保存されます（localStorage）。
+
+■ ライセンス
+  MIT License（LICENSE.txt を参照）。Copyright (c) 2026 Sinme52
 `;
 
 const out = join(here, 'dist');
@@ -82,6 +85,7 @@ rmSync(out, { recursive: true, force: true });
 mkdirSync(join(out, 'orbit-post'), { recursive: true });
 writeFileSync(join(out, 'orbit-post', 'index.html'), html);
 writeFileSync(join(out, 'orbit-post', 'README.txt'), readme);
+writeFileSync(join(out, 'orbit-post', 'LICENSE.txt'), readFileSync(join(here, 'LICENSE'), 'utf8'));
 // -X: no extra file attributes, -D: no directory entries -> index.html sits at the zip root
-execFileSync('zip', ['-X', '-D', '-j', join(out, 'orbit-post.zip'), join(out, 'orbit-post', 'index.html'), join(out, 'orbit-post', 'README.txt')], { stdio: 'inherit' });
+execFileSync('zip', ['-X', '-D', '-j', join(out, 'orbit-post.zip'), join(out, 'orbit-post', 'index.html'), join(out, 'orbit-post', 'README.txt'), join(out, 'orbit-post', 'LICENSE.txt')], { stdio: 'inherit' });
 console.log('built', join(out, 'orbit-post.zip'));
