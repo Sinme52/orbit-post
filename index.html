@@ -161,7 +161,7 @@ kbd{
 
   <section class="notes">
     <h1>Orbit Post</h1>
-    <p class="lede">宇宙の配達便。コックピットから4つの星系を飛び、荷物をステーションからステーションへ届けます。160×144・4階調、フラットシェーディングとディザだけで描いた3Dと、4チャンネルのチップチューンBGMで動く試作です。</p>
+    <p class="lede">宇宙の配達便。コックピットから5つの星系を飛び、荷物をステーションからステーションへ届けます。160×144・4階調、フラットシェーディングとディザだけで描いた3Dと、4チャンネルのチップチューンBGMで動く試作です。</p>
 
     <h2>操作</h2>
     <table class="keys">
@@ -180,6 +180,7 @@ kbd{
       <li><b>2 TALOS</b><span>環をもつ巨大ガス惑星。環の中を飛ぶと船体が削れるので、環のすき間を通る。</span></li>
       <li><b>3 MIRE</b><span>霧の星雲。遠くが見えないので、レーダーと誘導灯が頼り。漂う岩と、霧に隠れた小惑星に注意。</span></li>
       <li><b>4 HELIOS</b><span>恒星のすぐそば。近づきすぎると熱で船体が傷む。岩が恒星のまわりを回っている。</span></li>
+      <li><b>5 NADIR</b><span>最後の星系。中心のブラックホールが船を引き寄せる。光る降着円盤に触れると船体が焼け、穴に落ちると戻れない。クリアするとエンディング。</span></li>
     </ul>
 
     <h2>遊び方</h2>
@@ -371,6 +372,9 @@ MESH.ice = sphereMesh(1, c => 0.8 + 0.2 * fbm(mul(c, 3), 90));
 MESH.dark = sphereMesh(2, c => 0.3 + 0.3 * fbm(mul(c, 2.7), 120));
 MESH.sun = sphereMesh(2, c => 2.72 + 0.28 * fbm(mul(c, 4), 150));
 MESH.umbra = sphereMesh(2, c => { const n = fbm(mul(c, 2.2), 170); return n > 0.55 ? 0.85 : n > 0.42 ? 0.6 : 0.4; });
+MESH.hole = sphereMesh(1, () => 2.0);   // emissive at zero: a pure black disc that hides the stars behind it
+MESH.disk = Mesh();
+annulus(MESH.disk, [[300, 420, 2.95], [420, 560, 2.75], [560, 700, 2.55]], 40);
 MESH.ring = Mesh();
 annulus(MESH.ring, [[950, 1080, 0.8], [1080, 1200, 0.6], [1280, 1440, 0.9], [1440, 1600, 0.65]], 48);
 
@@ -458,7 +462,7 @@ function buildTalos() {
   return { ports: [st, keel, yard], objects: [giant, ring, ice, ...gapRocks, ...outerRocks],
     bodies: [giant, ice, ...gapRocks, ...outerRocks],
     light: norm([0.5, 0.6, 0.6]), amb: 0.1,
-    ring: { obj: ring, bands: [[950, 1200], [1280, 1600]], half: 14 } };
+    ring: { obj: ring, bands: [[950, 1200], [1280, 1600]], half: 14, msg: 'RING DEBRIS!' } };
 }
 function buildMire() {
   const gate = stationPort('MIRE GATE', [0, 0, 0], [0, 0, 1], 0.25);
@@ -476,6 +480,17 @@ function buildMire() {
   return { ports: [gate, lamp, well], objects: [rock, ...drift], bodies: [rock, ...drift],
     light: norm([0.3, 0.8, -0.5]), amb: 0.16, fog: { start: 110, end: 560, I: 0.07 }, nebula: neb };
 }
+function orbitRocks(R, n, rmin, rmax, avoidBands, spread) {
+  const out = [];
+  while (out.length < n) {
+    const r = rmin + R() * (rmax - rmin);
+    if (avoidBands.some(([a, b]) => r > a && r < b)) continue;
+    const o = rockField(R, 1, () => [r, 0, 0], [], 8, 26)[0];
+    o.orbit = { r, ph: R() * Math.PI * 2, w: (32 + R() * 40) / r, y: (R() - 0.5) * spread };
+    out.push(o);
+  }
+  return out;
+}
 function buildHelios() {
   const SUN = [0, 0, 0];
   const sun = sphereBody(MESH.sun, SUN, 500, 0.05);
@@ -486,22 +501,32 @@ function buildHelios() {
   const flare = outpostPort('FLARE LAB', fp, fp);
   const shade = outpostPort('SHADE POST', sp, sub(sp, umbra.pos));
   const R = rng(55);
-  const orbiters = [];
-  while (orbiters.length < 26) {
-    const r = 720 + R() * 1500;
-    if ((r > 1150 && r < 1350) || (r > 880 && r < 1030)) continue;
-    const o = rockField(R, 1, () => [r, 0, 0], [], 8, 26)[0];
-    o.orbit = { r, ph: R() * Math.PI * 2, w: (32 + R() * 40) / r, y: (R() - 0.5) * 140 };
-    orbiters.push(o);
-  }
+  const orbiters = orbitRocks(R, 26, 720, 2220, [[1150, 1350], [880, 1030]], 140);
   return { ports: [ring, flare, shade], objects: [sun, umbra, ...orbiters], bodies: [sun, umbra, ...orbiters],
-    point: SUN, amb: 0.06, sunObj: sun, heat: { c: SUN, r0: 1150, r1: 600 } };
+    point: SUN, amb: 0.06, glow: { obj: sun, k: 1.3, add: 6, I: 0.55 }, heat: { c: SUN, r0: 1150, r1: 600 } };
+}
+function buildNadir() {
+  const C = [0, 0, 0];
+  const hole = sphereBody(MESH.hole, C, 220, 0);
+  hole.fatal = true;
+  const disk = makeObj(MESH.disk, C, [0, 0, 1], { up: norm([0.3, 1, 0.1]) });
+  disk.spinAxis = disk.ay; disk.spinW = 0.25;
+  const a = outpostPort('EDGE POST', [-1600, -300, 1650], [-1600, -300, 1650]);
+  const st = stationPort('NADIR DOCK', [2300, 200, 0], [1, 0, 0], 0.4);
+  const c = outpostPort('LAST LIGHT', [-700, 400, -2200], [-700, 400, -2200]);
+  const R = rng(77);
+  const orbiters = orbitRocks(R, 22, 850, 1700, [], 260);
+  return { ports: [st, a, c], objects: [hole, disk, ...orbiters], bodies: [hole, ...orbiters],
+    point: C, amb: 0.08, glow: { obj: hole, k: 1.22, add: 3, I: 0.7 },
+    ring: { obj: disk, bands: [[300, 700]], half: 12, msg: 'DISK PLASMA!' },
+    grav: { c: C, gm: 1.2e7 } };
 }
 const STAGES = [
   { name: 'AURA',   music: 'aura',   build: buildAura,   intro: ['WELCOME, PILOT.', 'FIRST JOB IS READY.'] },
   { name: 'TALOS',  music: 'talos',  build: buildTalos,  intro: ['STAGE 2  TALOS', 'RING DEBRIS HURTS.'] },
   { name: 'MIRE',   music: 'mire',   build: buildMire,   intro: ['STAGE 3  MIRE', 'FOG AHEAD. USE RADAR.'] },
   { name: 'HELIOS', music: 'helios', build: buildHelios, intro: ['STAGE 4  HELIOS', 'KEEP AWAY FROM SUN.'] },
+  { name: 'NADIR',  music: 'nadir',  build: buildNadir,  intro: ['STAGE 5  NADIR', 'GRAVITY PULLS YOU IN.'] },
 ];
 const QUOTA = 3;
 let STAGE = null;
@@ -526,7 +551,6 @@ function makeVP(x0, y0, x1, y1, fov) {
 const VP_FLIGHT = makeVP(0, 0, W, VH, 70 * Math.PI / 180);
 const VP_TITLE = makeVP(0, 0, W, H, 70 * Math.PI / 180);
 const VP_CRATE = makeVP(103, 27, 157, 93, 40 * Math.PI / 180);
-const VP_END = makeVP(48, 40, 112, 96, 40 * Math.PI / 180);
 
 function clearVP(vp, c) {
   for (let y = vp.y0; y < vp.y1; y++) { const row = y * W; for (let x = vp.x0; x < vp.x1; x++) { fb[row + x] = c; zb[row + x] = 0; } }
@@ -694,9 +718,9 @@ function renderSpace(cam, vp) {
     const q = dirProject(cam, vp, S.light);
     if (q) { glow(vp, q.x, q.y, 4.5, 11, 0.5); glow(vp, q.x, q.y, 4.5, 4.6, 1); }
   }
-  if (S.sunObj) {
-    const q = camProject(cam, vp, S.sunObj.pos);
-    if (q) { const rp = S.sunObj.s * vp.F * q.w; glow(vp, q.x, q.y, rp * 0.95, rp * 1.3 + 6, 0.55); }
+  if (S.glow) {
+    const q = camProject(cam, vp, S.glow.obj.pos);
+    if (q) { const rp = S.glow.obj.s * vp.F * q.w; glow(vp, q.x, q.y, rp * 0.95, rp * S.glow.k + S.glow.add, S.glow.I); }
   }
   renderObjects(cam, S.scene, vp, S.light, { amb: S.amb, fog: S.fog, point: S.point });
 }
@@ -763,6 +787,12 @@ const TRACKS = {
   helios: { bpm: 156, chords: 'Cm Ab Bb G Cm Ab Fm G',
     lead: 'C5:2 D#5:2 G5:2 C6:4 A#5:2 G5:4 | G#5:4 G5:2 D#5:2 C5:8 | A#4:2 D5:2 F5:2 A#5:4 G#5:2 F5:4 | G5:4 B4:4 D5:4 F5:4 | G5:2 G5:2 C6:4 D#6:4 D6:2 C6:2 | C6:4 G#5:4 D#5:4 C5:4 | F5:4 G#5:4 C6:4 G#5:4 | B5:8 D6:8',
     bass: 'R.O.R.O.R.O.R.O.', arp: [0, 1, 2, 1], arpOct: 5, arpVol: 0.012, drums: 'k.hsk.hsk.hsk.ss' },
+  nadir: { bpm: 128, chords: 'F#m D E C# F#m D Bm C#',
+    lead: 'F#5:4 A5:4 C#6:6 B5:2 | A5:4 F#5:4 D5:8 | E5:2 G#5:2 B5:4 E6:4 D6:2 B5:2 | C#6:8 G#5:4 F5:4 | C#6:4 A5:2 C#6:2 F#6:8 | F#6:4 E6:4 D6:4 A5:4 | B5:4 D6:4 F#6:4 D6:4 | C#6:12 r:4',
+    bass: 'R.R.R.O.R.R.5.O.', arp: [0, 1, 2, 1], arpOct: 4, arpVol: 0.016, drums: 'k.h.s.h.k.hks.h.' },
+  ending: { bpm: 100, chords: 'C G Am Em F C Dm G',
+    lead: 'E5:4 D5:2 C5:2 G5:8 | D5:4 B4:2 D5:2 G5:8 | C6:4 B5:2 A5:2 E5:8 | G5:4 F#5:2 E5:2 B4:8 | A5:4 G5:2 F5:2 C6:8 | E5:4 G5:4 C6:8 | F5:4 E5:2 D5:2 A5:8 | B5:8 D6:8',
+    bass: 'R...5...R...5...', arp: [0, 1, 2, 1], arpOct: 4, drums: 'k.......s.......' },
   clear: { bpm: 150, loop: false, chords: 'C C',
     lead: 'C5:2 E5:2 G5:2 C6:6 G5:2 C6:2 | E6:12 r:4',
     bass: 'R...R...O.......', arp: null, drums: 'k.k.k...s.......' },
@@ -916,9 +946,9 @@ const jobRng = rng(42);
 
 const G = {
   state: 'title', t: 0, blink: 0, pal: 0, musicOn: true, psel: 0,
-  ship: { pos: [0,0,0], r: [1,0,0], u: [0,1,0], f: [0,0,1], speed: 0, fuel: 100, hull: 100, pv: 0, yv: 0, rv: 0, lowFuelWarned: false },
+  ship: { pos: [0,0,0], r: [1,0,0], u: [0,1,0], f: [0,0,1], speed: 0, fuel: 100, hull: 100, pv: 0, yv: 0, rv: 0, drift: [0, 0, 0], lowFuelWarned: false },
   credits: 0, delivered: 0, job: null, port: 0, lastPort: 0, target: 1,
-  stage: 0, sel: 0, unlocked: 1, stageDone: 0, cleared: false, heat: 0,
+  stage: 0, sel: 0, unlocked: 1, stageDone: 0, cleared: false, heat: 0, grav: 0, endT: 0, cardT: -1,
   msg: '', msgT: 0, shake: 0, lostMsg: '', lostT: 0, dockEvent: [], crateA: 0, warpT: 0,
   dust: [],
 };
@@ -935,7 +965,7 @@ function buildStage(n) {
   const def = STAGES[n], b = def.build();
   STAGE = Object.assign({ n, quota: QUOTA }, def, b);
   STAGE.scene = [...b.objects, ...b.ports.map(p => p.obj)];
-  G.stage = n; G.stageDone = 0; G.cleared = false; G.heat = 0;
+  G.stage = n; G.stageDone = 0; G.cleared = false; G.heat = 0; G.grav = 0;
   G.job = newJob(0);
 }
 function newJob(from) {
@@ -954,7 +984,7 @@ function startGame() {
 function dockAt(idx, events) {
   const s = G.ship;
   G.state = 'docked'; G.port = idx; G.lastPort = idx;
-  s.speed = 0; s.fuel = 100; s.hull = 100; s.lowFuelWarned = false;
+  s.speed = 0; s.fuel = 100; s.hull = 100; s.lowFuelWarned = false; s.drift = [0, 0, 0];
   G.dockEvent = events;
 }
 function dock(idx) {
@@ -980,7 +1010,7 @@ function launch() {
   const b = basisFrom(o.az);
   s.pos = add(o.pos, mul(o.az, P.hub[5] + 45));
   s.r = b.r; s.u = b.u; s.f = b.f;
-  s.speed = 12; s.pv = s.yv = s.rv = 0;
+  s.speed = 12; s.pv = s.yv = s.rv = 0; s.drift = [0, 0, 0];
   G.target = G.job ? G.job.to : (G.port + 1) % STAGE.ports.length;
   G.state = 'flight';
   initDust();
@@ -988,7 +1018,7 @@ function launch() {
   tone(392, 0.06); tone(587, 0.1, 'square', 0.04, 0.06);
 }
 function lose(msg) {
-  G.state = 'lost'; G.lostMsg = msg; G.lostT = 3; G.ship.speed = 0; G.shake = 0.5;
+  G.state = 'lost'; G.lostMsg = msg; G.lostT = 3; G.ship.speed = 0; G.ship.drift = [0, 0, 0]; G.shake = 0.5;
   [330, 262, 196, 147].forEach((f, i) => tone(f, 0.16, 'square', 0.05, i * 0.14));
 }
 function tow() {
@@ -1055,13 +1085,23 @@ function flight(dt) {
   s.fuel = Math.max(0, s.fuel - s.speed * 0.012 * dt);
   if (s.fuel < 25 && !s.lowFuelWarned) { s.lowFuelWarned = true; say('LOW FUEL', 2); tone(988, 0.08); tone(988, 0.08, 'square', 0.04, 0.16); }
 
+  // gravity well: pulls the ship sideways no matter where the nose points
+  G.grav = 0;
+  if (S.grav) {
+    const d = sub(S.grav.c, s.pos), dl = len(d), acc = Math.min(60, S.grav.gm / (dl * dl));
+    s.drift = add(s.drift, mul(d, acc * dt / dl));
+    G.grav = clamp(acc / 25, 0, 1);
+  }
+  s.drift = mul(s.drift, Math.max(0, 1 - 1.0 * dt));
+
   const prev = s.pos;
-  s.pos = add(s.pos, mul(s.f, s.speed * dt));
+  s.pos = add(add(s.pos, mul(s.f, s.speed * dt)), mul(s.drift, dt));
 
   // spheres: planets, sun, rocks
   for (const b of S.bodies) {
     const d = sub(s.pos, b.pos), dl = len(d);
     if (dl < b.cr + 3) {
+      if (b.fatal) { s.hull = 0; lose('LOST IN THE DARK'); return; }
       s.pos = add(b.pos, mul(d, (b.cr + 3.5) / (dl || 1)));
       if (b.big) { hit(30, 'TOO CLOSE!'); s.speed = 0; }
       else { hit(6 + s.speed * 0.3, 'COLLISION'); s.speed *= 0.25; }
@@ -1072,7 +1112,7 @@ function flight(dt) {
     const lp = toLocal(S.ring.obj, s.pos), rad = Math.hypot(lp[0], lp[2]);
     if (Math.abs(lp[1]) < S.ring.half && S.ring.bands.some(([r0, r1]) => rad >= r0 && rad < r1)) {
       s.hull -= 45 * dt; s.speed *= Math.max(0, 1 - 2 * dt); G.shake = 0.15;
-      if (G.msgT < 0.3) { say('RING DEBRIS!', 0.6); tone(90 + Math.random() * 60, 0.08, 'sawtooth', 0.04); }
+      if (G.msgT < 0.3) { say(S.ring.msg, 0.6); tone(90 + Math.random() * 60, 0.08, 'sawtooth', 0.04); }
     }
   }
   // star heat
@@ -1199,11 +1239,13 @@ function renderFlight() {
     else { rect(x, 2, w, 9, 3); txt(word, x + 3, 4, 0); }
     break;
   }
-  // heat gauge
-  if (G.heat > 0) {
-    rect(2, 2, 34, 9, 3); frame(2, 2, 34, 9, 0); txt('HEAT', 4, 4, 0);
-    rect(21, 4, Math.max(1, Math.round(13 * G.heat)), 5, G.blink && G.heat > 0.5 ? 0 : 1);
-  }
+  // hazard gauges
+  const gauge = (label, v) => {
+    rect(2, 2, 34, 9, 3); frame(2, 2, 34, 9, 0); txt(label, 4, 4, 0);
+    rect(21, 4, Math.max(1, Math.round(13 * v)), 5, G.blink && v > 0.5 ? 0 : 1);
+  };
+  if (G.heat > 0) gauge('HEAT', G.heat);
+  else if (G.grav > 0.08) gauge('GRAV', G.grav);
 
   if (G.msgT > 0 && G.state === 'flight') msgBox(G.msg, 40);
   drawHUD();
@@ -1352,17 +1394,45 @@ function renderWarp() {
     txtO(STAGES[next].name, 80, 76, 2);
   }
 }
+// ending: back home at AURA, an epilogue scrolls up, then THE END card
+const END_SPEED = 14, END_GAP = 10;
+function endLines() {
+  return ['ALL ROUTES CLEAR', '', 'SYSTEMS  ' + STAGES.length, 'DELIVERIES  ' + pad(G.delivered, 2), 'CREDITS  ' + pad(G.credits, 4),
+    '', 'EVERY PARCEL', 'FOUND ITS HOME.', '', 'AURA  TALOS  MIRE', 'HELIOS  NADIR', '', 'ORBIT POST', 'SPACE COURIER', '', 'THANK YOU, PILOT.'];
+}
+const endScrollTime = () => (H + (endLines().length - 1) * END_GAP - 18) / END_SPEED;
+function startEnding() {
+  buildStage(0);
+  G.state = 'ending'; G.endT = 0; G.cardT = -1;
+}
+function updateEnding(dt) {
+  G.endT += dt;
+  if (G.cardT < 0) {
+    if (G.endT >= endScrollTime()) G.cardT = 0;
+    else if (G.endT > 2 && (pressed('start') || pressed('a'))) { G.endT = endScrollTime(); G.cardT = 0; }
+    return;
+  }
+  G.cardT += dt;
+  if (G.cardT > 1.5 && (pressed('start') || pressed('a'))) {
+    G.state = 'title'; G.sel = 0; buildStage(0);
+  }
+}
 function renderEnding() {
-  rect(0, 0, W, H, 0);
-  for (let i = 0; i < 60; i++) pset((i * 53) % 160, (i * 97) % 144, (i % 5 === 0) ? 2 : 1);
-  txtO('ALL ROUTES CLEAR', 80, 14, 3);
-  txtO('THANK YOU, PILOT.', 80, 26, 2);
-  clearVP(VP_END, 0);
-  spinCrate(crate, G.t);
-  renderObjects(CRATE_CAM, [crate], VP_END, CRATE_LIGHT);
-  txtO('CREDITS  ' + pad(G.credits, 4), 80, 104, 3);
-  txtO('DELIVERIES  ' + pad(G.delivered, 2), 80, 113, 3);
-  if (G.blink) txtO('PRESS START', 80, 130, 3);
+  const planet = STAGE.objects[0], a = 2.2 + G.endT * 0.025;
+  const pos = add(planet.pos, [Math.sin(a) * 2300, 700, -Math.cos(a) * 2300]);
+  const b = basisFrom(sub(add(planet.pos, [0, 350, 0]), pos));
+  renderSpace({ pos, r: b.r, u: b.u, f: b.f }, VP_TITLE);
+  if (G.cardT < 0) {
+    const y0 = H - G.endT * END_SPEED;
+    endLines().forEach((l, i) => {
+      const y = Math.round(y0 + i * END_GAP);
+      if (l && y > -6 && y < H) txtO(l, 80, y, i === 0 ? 3 : 2);
+    });
+  } else {
+    const k = Math.min(1, G.cardT / 1.2);
+    txtO('THE END', 80, 56, k > 0.5 ? 3 : 2, 2);
+    if (G.cardT > 1.5 && G.blink) txtO('PRESS START', 80, 112, 3);
+  }
 }
 
 // ===================== input =====================
@@ -1424,7 +1494,8 @@ function blit() {
 }
 function wantedTrack() {
   switch (G.state) {
-    case 'title': case 'ending': return 'title';
+    case 'title': return 'title';
+    case 'ending': return 'ending';
     case 'docked': return G.cleared ? 'clear' : 'dock';
     case 'warp': return null;
     default: return STAGE.music;
@@ -1448,7 +1519,7 @@ function update(dt) {
       if (pressed('a') || pressed('start')) {
         if (!G.cleared) launch();
         else if (STAGE.n < STAGES.length - 1) { G.state = 'warp'; G.warpT = 0; sweep(110, 1760, 2.6, 0.035); }
-        else { G.state = 'ending'; }
+        else startEnding();
       }
       break;
     case 'flight': flight(dt); break;
@@ -1465,9 +1536,7 @@ function update(dt) {
       G.warpT += dt;
       if (G.warpT >= 3.2) { const n = STAGE.n + 1; G.sel = n; buildStage(n); dockAt(0, STAGES[n].intro); }
       break;
-    case 'ending':
-      if (pressed('start') || pressed('a')) { G.state = 'title'; G.sel = G.unlocked - 1; buildStage(G.sel); }
-      break;
+    case 'ending': updateEnding(dt); break;
   }
   playTrack(wantedTrack());
   for (const k of KEYS) PREV[k] = K[k];
