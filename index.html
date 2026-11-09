@@ -1,0 +1,1099 @@
+<meta charset="utf-8">
+<title>Orbit Post</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+1p:wght@400;700&display=swap">
+<style>
+/* Layout: one handheld console in the middle of a night-sky page; notes sit beside it on wide screens and below it on phones.
+   Single deliberate dark look (no light variant): the console body carries the only light surface. */
+:root{
+  --night:#13151c;
+  --ink:#e8e5da;
+  --muted:#a29f92;
+  --rule:#2c2f3a;
+  --shell:#d3cec1;
+  --shell-shade:#b4ae9f;
+  --bezel:#363945;
+  --bezel-ink:#9ea1b0;
+  --key:#23252c;
+  --key-hi:#3a3d47;
+  --ab:#2f6c66;
+  --ab-hi:#3f8a82;
+  --label:#545867;
+  --led:#d8513f;
+  --display:"DotGothic16", ui-monospace, "Courier New", monospace;
+  --body:"M PLUS 1p", "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--night);color:var(--ink);font-family:var(--body);line-height:1.7}
+.page{
+  display:flex;flex-wrap:wrap;gap:32px 48px;justify-content:center;align-items:flex-start;
+  padding-block:28px 48px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* ---------- console ---------- */
+.device{
+  width:min(100%, 568px);
+  background:var(--shell);
+  border-radius:14px 14px 64px 14px;
+  padding:18px 18px 30px;
+  box-shadow:inset 0 -6px 0 var(--shell-shade), 0 18px 40px rgba(0,0,0,.45);
+  user-select:none;-webkit-user-select:none;
+}
+.bezel{
+  background:var(--bezel);
+  border-radius:10px 10px 36px 10px;
+  padding:12px 16px 22px;
+}
+.bezel-top{
+  display:flex;align-items:center;gap:8px;margin-bottom:10px;
+  font:11px/1 var(--display);letter-spacing:.14em;color:var(--bezel-ink);
+}
+.bezel-top .line{flex:1;height:2px;background:var(--bezel-ink);opacity:.35}
+.led{width:8px;height:8px;border-radius:50%;background:var(--led);box-shadow:0 0 6px var(--led)}
+.screen{display:flex;justify-content:center}
+#lcd{display:block;image-rendering:pixelated;image-rendering:crisp-edges;width:320px;height:288px;max-width:100%}
+.brand{
+  margin:14px 4px 6px;font:20px/1 var(--display);color:var(--label);letter-spacing:.06em;
+}
+.brand small{font-size:11px;letter-spacing:.2em;margin-left:8px}
+
+.pad{
+  display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;
+  margin-top:18px;padding-inline:4px;touch-action:none;
+}
+.dpad{position:relative;width:132px;height:132px;touch-action:none;cursor:pointer}
+.dpad::before,.dpad::after{content:"";position:absolute;background:var(--key);border-radius:6px;box-shadow:0 3px 0 rgba(0,0,0,.35)}
+.dpad::before{left:44px;top:4px;width:44px;height:124px}
+.dpad::after{top:44px;left:4px;width:124px;height:44px}
+.dpad .hub{position:absolute;left:58px;top:58px;width:16px;height:16px;border-radius:50%;background:var(--key-hi);z-index:1}
+.dpad .arrow{position:absolute;z-index:1;width:0;height:0;border:7px solid transparent;opacity:.5}
+.dpad .u{left:59px;top:12px;border-bottom-color:var(--key-hi)}
+.dpad .d{left:59px;bottom:12px;border-top-color:var(--key-hi)}
+.dpad .l{top:59px;left:12px;border-right-color:var(--key-hi)}
+.dpad .r{top:59px;right:12px;border-left-color:var(--key-hi)}
+.dpad .arrow.on{opacity:1;border-color:transparent}
+.dpad .u.on{border-bottom-color:var(--ab-hi)}
+.dpad .d.on{border-top-color:var(--ab-hi)}
+.dpad .l.on{border-right-color:var(--ab-hi)}
+.dpad .r.on{border-left-color:var(--ab-hi)}
+
+.ab{display:flex;gap:16px;transform:rotate(-24deg);justify-self:end;padding:10px 4px}
+.ab .col{display:flex;flex-direction:column;align-items:center;gap:6px}
+.ab .col:first-child{margin-top:26px}
+.btn-round{
+  width:58px;height:58px;border-radius:50%;border:0;background:var(--ab);
+  box-shadow:0 4px 0 rgba(0,0,0,.35);touch-action:none;cursor:pointer;
+}
+.btn-round.on,.btn-pill.on{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.35);background:var(--ab-hi)}
+.btn-label{font:13px/1 var(--display);color:var(--label);letter-spacing:.1em}
+.sys{display:flex;justify-content:center;gap:22px;margin-top:20px}
+.sys .col{display:flex;flex-direction:column;align-items:center;gap:6px;transform:rotate(-24deg)}
+.btn-pill{
+  width:54px;height:14px;border-radius:8px;border:0;background:var(--label);
+  box-shadow:0 3px 0 rgba(0,0,0,.3);touch-action:none;cursor:pointer;
+}
+.btn-pill.on{background:var(--key)}
+.device button:focus-visible,.dpad:focus-visible{outline:3px solid var(--ab-hi);outline-offset:3px}
+
+/* ---------- notes ---------- */
+.notes{flex:1 1 300px;max-width:400px;min-width:0}
+.notes h1{font:32px/1.2 var(--display);margin:4px 0 6px;letter-spacing:.04em;text-wrap:balance}
+.notes .lede{color:var(--muted);margin:0 0 24px}
+.notes h2{font:15px/1.4 var(--display);letter-spacing:.12em;color:var(--muted);margin:28px 0 10px;text-transform:uppercase}
+.keys{width:100%;border-collapse:collapse;font-size:14px}
+.keys td{padding:7px 0;border-top:1px solid var(--rule);vertical-align:top}
+.keys td:first-child{width:46%;padding-right:12px;white-space:nowrap}
+kbd{
+  font:12px/1 var(--display);background:var(--rule);color:var(--ink);
+  border-radius:4px;padding:3px 6px;display:inline-block;margin-right:2px;
+}
+.notes ol{padding-left:1.3em;margin:0}
+.notes li{margin-bottom:6px}
+.hud-words{font-family:var(--display);letter-spacing:.06em}
+.hint{font-size:13px;color:var(--muted);margin-top:22px;border-left:2px solid var(--rule);padding-left:12px}
+
+@media (max-width:520px){
+  .page{padding-block:16px 32px;gap:24px}
+  .device{padding:8px 8px 24px;border-radius:12px 12px 48px 12px}
+  .bezel{padding:8px 8px 14px;border-radius:8px 8px 26px 8px}
+  .dpad{transform:scale(.9);transform-origin:left center}
+  .btn-round{width:52px;height:52px}
+}
+@media (prefers-reduced-motion:reduce){
+  .btn-round.on,.btn-pill.on{transform:none}
+}
+</style>
+
+<main class="page">
+  <section class="device" aria-label="Orbit Post handheld">
+    <div class="bezel">
+      <div class="bezel-top"><span class="led" aria-hidden="true"></span><span class="line"></span><span>4-SHADE LCD 160×144</span><span class="line"></span></div>
+      <div class="screen" id="screen"><canvas id="lcd" width="160" height="144" aria-label="ゲーム画面"></canvas></div>
+    </div>
+    <div class="brand">Orbit Post<small>SPACE COURIER</small></div>
+
+    <div class="pad">
+      <div class="dpad" id="dpad" role="group" aria-label="十字キー">
+        <span class="hub"></span>
+        <span class="arrow u" data-dir="up"></span><span class="arrow d" data-dir="down"></span>
+        <span class="arrow l" data-dir="left"></span><span class="arrow r" data-dir="right"></span>
+      </div>
+      <span></span>
+      <div class="ab">
+        <div class="col"><button class="btn-round" data-btn="b" aria-label="B"></button><span class="btn-label">B</span></div>
+        <div class="col"><button class="btn-round" data-btn="a" aria-label="A"></button><span class="btn-label">A</span></div>
+      </div>
+    </div>
+    <div class="sys">
+      <div class="col"><button class="btn-pill" data-btn="select" aria-label="SELECT"></button><span class="btn-label">SELECT</span></div>
+      <div class="col"><button class="btn-pill" data-btn="start" aria-label="START"></button><span class="btn-label">START</span></div>
+    </div>
+  </section>
+
+  <section class="notes">
+    <h1>Orbit Post</h1>
+    <p class="lede">宇宙の配達便。コックピットから星系を飛び、荷物をステーションからステーションへ届けます。160×144・4階調、フラットシェーディングとディザだけで描いた3D試作です。</p>
+
+    <h2>操作</h2>
+    <table class="keys">
+      <tr><td><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 十字キー</td><td>機首の上下・左右</td></tr>
+      <tr><td><kbd>Z</kbd> A</td><td>加速（燃料を使う）</td></tr>
+      <tr><td><kbd>X</kbd> B</td><td>減速</td></tr>
+      <tr><td><kbd>X</kbd>＋<kbd>←</kbd><kbd>→</kbd></td><td>ロール（機体を傾ける）</td></tr>
+      <tr><td><kbd>Shift</kbd> SELECT</td><td>目標の切り替え</td></tr>
+      <tr><td><kbd>Enter</kbd> START</td><td>一時停止。停止中に左右で画面の色を変更</td></tr>
+    </table>
+
+    <h2>遊び方</h2>
+    <ol>
+      <li>ドックで荷物を受け取り、A で発進します。</li>
+      <li>画面の囲みか端の矢印、下のレーダーを頼りに目的地へ。間の小惑星帯にぶつかると船体が傷みます。</li>
+      <li>ドックの正面に点滅する誘導灯が並んでいます。速度 25 以下で、扉の中心へまっすぐ入るとドッキング成功です。</li>
+      <li>画面上の表示 <span class="hud-words">SLOW DOWN / ALIGN / CENTER / DOCK OK</span> を見ながら寄せてください。</li>
+    </ol>
+    <p class="hint">キーボードで遊ぶときは、先にゲーム画面を一度クリックしてください。スマホでは画面下のボタンで操作できます。</p>
+  </section>
+</main>
+
+<script>
+(() => {
+'use strict';
+
+// ===================== framebuffer =====================
+const W = 160, H = 144, VH = 120;
+const NEAR = 0.5;
+const fb = new Uint8Array(W * H);      // brightness 0 (dark) .. 3 (light)
+const zb = new Float32Array(W * H);    // 1/z, 0 = empty
+const BAYER = [0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5].map(v => (v + 0.5) / 16);
+function dith(i, x, y) {
+  const b = i * 3;
+  if (b <= 0) return 0;
+  if (b >= 3) return 3;
+  const f = b | 0;
+  return (b - f) > BAYER[((y & 3) << 2) | (x & 3)] ? f + 1 : f;
+}
+
+// ===================== math =====================
+const add = (a, b) => [a[0]+b[0], a[1]+b[1], a[2]+b[2]];
+const sub = (a, b) => [a[0]-b[0], a[1]-b[1], a[2]-b[2]];
+const mul = (a, s) => [a[0]*s, a[1]*s, a[2]*s];
+const dot = (a, b) => a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+const cross = (a, b) => [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
+const len = a => Math.hypot(a[0], a[1], a[2]);
+const norm = a => { const l = len(a) || 1; return [a[0]/l, a[1]/l, a[2]/l]; };
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+function rot(v, k, a) {
+  const c = Math.cos(a), s = Math.sin(a), kv = cross(k, v), d = dot(k, v) * (1 - c);
+  return [v[0]*c + kv[0]*s + k[0]*d, v[1]*c + kv[1]*s + k[1]*d, v[2]*c + kv[2]*s + k[2]*d];
+}
+function basisFrom(f, up = [0, 1, 0]) {
+  f = norm(f);
+  if (Math.abs(dot(f, up)) > 0.98) up = [1, 0, 0];
+  const r = norm(cross(up, f));
+  return { r, u: cross(f, r), f };
+}
+function rng(seed) {
+  return () => {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function h3(x, y, z, s) {
+  let h = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^ Math.imul(z, 1440662683) ^ Math.imul(s, 2246822519);
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  h ^= h >>> 16;
+  return (h >>> 0) / 4294967296;
+}
+function vnoise(x, y, z, s) {
+  const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z);
+  const xf = x - xi, yf = y - yi, zf = z - zi;
+  const u = xf*xf*(3-2*xf), v = yf*yf*(3-2*yf), w = zf*zf*(3-2*zf);
+  let r = 0;
+  for (let dz = 0; dz < 2; dz++) for (let dy = 0; dy < 2; dy++) for (let dx = 0; dx < 2; dx++)
+    r += h3(xi+dx, yi+dy, zi+dz, s) * (dx ? u : 1-u) * (dy ? v : 1-v) * (dz ? w : 1-w);
+  return r;
+}
+function fbm(p, s) {
+  let a = 0.5, f = 1, r = 0;
+  for (let i = 0; i < 4; i++) { r += a * vnoise(p[0]*f, p[1]*f, p[2]*f, s + i); a *= 0.5; f *= 2; }
+  return r / 0.9375;
+}
+
+// ===================== meshes =====================
+// albedo < 2 : lit surface ; albedo >= 2 : emissive, intensity = albedo - 2
+function Mesh() { return { v: [], f: [] }; }
+function tri(m, a, b, c, al) { const i = m.v.length; m.v.push(a, b, c); m.f.push(i, i+1, i+2, al); }
+function quad(m, a, b, c, d, al) { tri(m, a, b, c, al); tri(m, a, c, d, al); }
+function box(m, x0, y0, z0, x1, y1, z1, al, tf) {
+  const P = (x, y, z) => tf ? tf([x, y, z]) : [x, y, z];
+  const a = P(x0,y0,z0), b = P(x1,y0,z0), c = P(x1,y1,z0), d = P(x0,y1,z0);
+  const e = P(x0,y0,z1), f = P(x1,y0,z1), g = P(x1,y1,z1), h = P(x0,y1,z1);
+  const A = Array.isArray(al) ? al : [al, al, al, al, al, al]; // -z +z -x +x -y +y
+  quad(m, a, b, c, d, A[0]); quad(m, e, f, g, h, A[1]);
+  quad(m, a, d, h, e, A[2]); quad(m, b, c, g, f, A[3]);
+  quad(m, a, b, f, e, A[4]); quad(m, d, c, g, h, A[5]);
+}
+function prism(m, n, r, z0, z1, al, capAl) {
+  for (let i = 0; i < n; i++) {
+    const a0 = (i + 0.5) / n * Math.PI * 2, a1 = (i + 1.5) / n * Math.PI * 2;
+    const x0 = Math.cos(a0)*r, y0 = Math.sin(a0)*r, x1 = Math.cos(a1)*r, y1 = Math.sin(a1)*r;
+    quad(m, [x0,y0,z0], [x1,y1,z0], [x1,y1,z1], [x0,y0,z1], al);
+    tri(m, [0,0,z0], [x0,y0,z0], [x1,y1,z0], capAl);
+    tri(m, [0,0,z1], [x0,y0,z1], [x1,y1,z1], capAl);
+  }
+}
+function torus(m, R, r, S, T, al) {
+  const P = (i, j) => {
+    const t = i / S * Math.PI * 2, p = j / T * Math.PI * 2 + Math.PI / T, q = R + r * Math.cos(p);
+    return [q * Math.cos(t), q * Math.sin(t), r * Math.sin(p)];
+  };
+  for (let i = 0; i < S; i++) for (let j = 0; j < T; j++)
+    quad(m, P(i,j), P(i+1,j), P(i+1,j+1), P(i,j+1), typeof al === 'function' ? al(i, j) : al);
+}
+function ico(sub, radiusFn, albFn) {
+  const t = (1 + Math.sqrt(5)) / 2;
+  const V = [[-1,t,0],[1,t,0],[-1,-t,0],[1,-t,0],[0,-1,t],[0,1,t],[0,-1,-t],[0,1,-t],[t,0,-1],[t,0,1],[-t,0,-1],[-t,0,1]].map(norm);
+  const F = [[0,11,5],[0,5,1],[0,1,7],[0,7,10],[0,10,11],[1,5,9],[5,11,4],[11,10,2],[10,7,6],[7,1,8],
+             [3,9,4],[3,4,2],[3,2,6],[3,6,8],[3,8,9],[4,9,5],[2,4,11],[6,2,10],[8,6,7],[9,8,1]];
+  let tris = F.map(f => [V[f[0]], V[f[1]], V[f[2]]]);
+  for (let s = 0; s < sub; s++) {
+    const next = [];
+    for (const [a, b, c] of tris) {
+      const ab = norm(add(a, b)), bc = norm(add(b, c)), ca = norm(add(c, a));
+      next.push([a, ab, ca], [b, bc, ab], [c, ca, bc], [ab, bc, ca]);
+    }
+    tris = next;
+  }
+  const m = Mesh();
+  for (const [a, b, c] of tris) {
+    tri(m, mul(a, radiusFn(a)), mul(b, radiusFn(b)), mul(c, radiusFn(c)), albFn(norm(add(add(a, b), c))));
+  }
+  return m;
+}
+// a thin lit frame around a dock door so it reads even on the night side
+function doorFrame(m, r, z) {
+  const o = r + 2, zz = z + 0.15, E = 2.62;
+  quad(m, [-o,-o,zz], [o,-o,zz], [o,-r,zz], [-o,-r,zz], E);
+  quad(m, [-o,r,zz], [o,r,zz], [o,o,zz], [-o,o,zz], E);
+  quad(m, [-o,-r,zz], [-r,-r,zz], [-r,r,zz], [-o,r,zz], E);
+  quad(m, [r,-r,zz], [o,-r,zz], [o,r,zz], [r,r,zz], E);
+}
+function rotZ(p, a) { const c = Math.cos(a), s = Math.sin(a); return [p[0]*c - p[1]*s, p[0]*s + p[1]*c, p[2]]; }
+
+// ===================== world objects =====================
+function makeObj(mesh, pos, az, opts = {}) {
+  const b = basisFrom(az || [0, 0, 1], opts.up);
+  const o = Object.assign({ mesh, pos, ax: b.r, ay: b.u, az: b.f, s: 1 }, opts);
+  let r = 0; for (const v of mesh.v) r = Math.max(r, len(v));
+  o.radius = r * o.s;
+  return o;
+}
+function orthoObj(o) { o.az = norm(o.az); o.ax = norm(cross(o.ay, o.az)); o.ay = cross(o.az, o.ax); }
+
+const LIGHT = norm([0.9, 0.4, 0.1]);
+const AMB = 0.1, DIF = 0.9;
+
+// planet
+const planetMesh = ico(2, () => 1, c => {
+  if (Math.abs(c[1]) > 0.86) return 1.0;
+  return fbm(mul(c, 2.3), 11) > 0.52 ? 0.95 : 0.5;
+});
+planetMesh.convex = true;
+const planet = makeObj(planetMesh, [-300, -500, 2400], [0, 0, 1], { s: 1100 });
+planet.cr = 1100 * 0.97; planet.big = true; planet.spinAxis = norm([0.2, 1, 0]); planet.spinW = 0.012;
+
+// moon
+const moonMesh = ico(1, () => 1, c => 0.55 + 0.35 * fbm(mul(c, 3.1), 40));
+moonMesh.convex = true;
+const moon = makeObj(moonMesh, [700, 150, -1800], [0, 0, 1], { s: 220 });
+moon.cr = 220 * 0.95; moon.big = true; moon.spinAxis = [0, 1, 0]; moon.spinW = 0.02;
+
+// station "AURA DOCK": hub along local z, dock door on +z
+const stationMesh = Mesh();
+prism(stationMesh, 6, 22, -30, 30, 0.8, 0.85);
+prism(stationMesh, 6, 22.5, -5, 5, 2.6, 0.8);            // lit window band
+quad(stationMesh, [-9,-9,30.6], [9,-9,30.6], [9,9,30.6], [-9,9,30.6], 0.06); // door
+doorFrame(stationMesh, 9, 30.5);
+torus(stationMesh, 70, 7, 16, 4, (i, j) => (i % 4 === 0 && j === 0) ? 2.7 : 0.72);
+for (let k = 0; k < 3; k++) { const a = k * Math.PI * 2 / 3; box(stationMesh, 20, -3, -3, 64, 3, 3, 0.6, p => rotZ(p, a)); }
+box(stationMesh, -4, -4, -56, 4, 4, -30, 0.55);
+box(stationMesh, -34, -1, -52, 34, 1, -44, 0.35);
+const station = makeObj(stationMesh, [0, 0, 600], [0, 0, -1]);
+station.spinW = 0.3;
+
+// outpost "LUNA POST": box module with solar wings, door on +z
+const outpostMesh = Mesh();
+box(outpostMesh, -18, -14, -18, 18, 14, 18, [0.7, 0.85, 0.7, 0.7, 0.6, 0.8]);
+quad(outpostMesh, [-8,-8,18.6], [8,-8,18.6], [8,8,18.6], [-8,8,18.6], 0.06);
+doorFrame(outpostMesh, 8, 18.5);
+box(outpostMesh, -24, -2, -2, -18, 2, 2, 0.6);
+box(outpostMesh, 18, -2, -2, 24, 2, 2, 0.6);
+box(outpostMesh, -70, -1, -9, -24, 1, 9, 0.32);
+box(outpostMesh, 24, -1, -9, 70, 1, 9, 0.32);
+box(outpostMesh, -1.5, 14, -1.5, 1.5, 30, 1.5, 0.6);
+box(outpostMesh, -2.5, 30, -2.5, 2.5, 34, 2.5, 2.9);
+const outpostPos = [560, 120, -1450];
+const outpost = makeObj(outpostMesh, outpostPos, sub(station.pos, outpostPos));
+outpost.spinW = 0;
+
+const PORTS = [
+  { name: 'AURA DOCK', obj: station, hub: [-20,-20,-30, 20,20,30], door: 9,
+    boxes: [[-4,-4,-56, 4,4,-30], [-34,-1,-52, 34,1,-44]], torus: { R: 70, r: 7 },
+    lights: [[-11,-11,31],[11,-11,31],[11,11,31],[-11,11,31]] },
+  { name: 'LUNA POST', obj: outpost, hub: [-18,-14,-18, 18,14,18], door: 8,
+    boxes: [[-70,-1,-9, -24,1,9], [24,-1,-9, 70,1,9], [-2.5,14,-2.5, 2.5,34,2.5]], torus: null,
+    lights: [[-10,-10,19],[10,-10,19],[10,10,19],[-10,10,19]] },
+];
+
+// asteroid belt between the two docks
+const asteroids = [];
+{
+  const R = rng(7);
+  const variants = [];
+  for (let v = 0; v < 5; v++) {
+    const seed = 100 + v * 17;
+    const m = ico(1, p => 1 + (fbm(mul(p, 1.7), seed) - 0.5) * 0.8, c => 0.5 + 0.3 * fbm(mul(c, 2.5), seed + 5));
+    variants.push(m);
+  }
+  const A = add(station.pos, [0, 0, -30]), B = add(outpost.pos, mul(outpost.az, 18));
+  const axis = norm(sub(B, A)), side = basisFrom(axis);
+  let tries = 0;
+  while (asteroids.length < 30 && tries++ < 500) {
+    const t = 0.18 + R() * 0.64;
+    const ang = R() * Math.PI * 2, rad = Math.sqrt(R()) * 280;
+    const p = add(add(A, mul(sub(B, A), t)), add(mul(side.r, Math.cos(ang) * rad), mul(side.u, Math.sin(ang) * rad)));
+    if (len(sub(p, station.pos)) < 180 || len(sub(p, outpost.pos)) < 160) continue;
+    const s = 7 + Math.pow(R(), 2) * 28;
+    if (asteroids.some(o => len(sub(o.pos, p)) < o.s + s + 20)) continue;
+    const o = makeObj(variants[(R() * 5) | 0], p, [R() - 0.5, R() - 0.5, R() - 0.5], { s });
+    o.cr = s * 0.9;
+    o.spinAxis = norm([R() - 0.5, R() - 0.5, R() - 0.5]);
+    o.spinW = 0.15 + R() * 0.6;
+    asteroids.push(o);
+  }
+}
+
+// parcel shown on the dock screen
+const crateMesh = Mesh();
+box(crateMesh, -10, -10, -10, 10, 10, 10, [0.85, 0.85, 0.8, 0.8, 0.7, 0.95]);
+box(crateMesh, -10.6, -10.6, -2.5, 10.6, 10.6, 2.5, 0.45);
+box(crateMesh, -2.5, -10.6, -10.6, 2.5, 10.6, 10.6, 0.45);
+const crate = makeObj(crateMesh, [0, 0, 0], [0, 0, 1]);
+
+const SCENE = [planet, moon, station, outpost, ...asteroids];
+const BODIES = [planet, moon, ...asteroids];
+
+// stars (directions at infinity)
+const STARS = [];
+{
+  const R = rng(3);
+  for (let i = 0; i < 240; i++) {
+    const d = norm([R() * 2 - 1, R() * 2 - 1, R() * 2 - 1]);
+    const q = R();
+    STARS.push([d, q < 0.7 ? 1 : q < 0.92 ? 2 : 3]);
+  }
+}
+
+// ===================== renderer =====================
+function makeVP(x0, y0, x1, y1, fov) {
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  const F = ((x1 - x0) / 2) / Math.tan(fov / 2);
+  return { x0, y0, x1, y1, cx, cy, F, tx: (x1 - x0) / 2 / F, ty: (y1 - y0) / 2 / F };
+}
+const VP_FLIGHT = makeVP(0, 0, W, VH, 70 * Math.PI / 180);
+const VP_TITLE = makeVP(0, 0, W, H, 70 * Math.PI / 180);
+const VP_CRATE = makeVP(103, 27, 157, 93, 40 * Math.PI / 180);
+
+function clearVP(vp, c) {
+  for (let y = vp.y0; y < vp.y1; y++) { const row = y * W; for (let x = vp.x0; x < vp.x1; x++) { fb[row + x] = c; zb[row + x] = 0; } }
+}
+
+function fillTri(x0, y0, w0, x1, y1, w1, x2, y2, w2, I, vp) {
+  let area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
+  if (area < 0) { let t = x1; x1 = x2; x2 = t; t = y1; y1 = y2; y2 = t; t = w1; w1 = w2; w2 = t; area = -area; }
+  if (area < 1e-9) return;
+  const minx = Math.max(vp.x0, Math.floor(Math.min(x0, x1, x2)));
+  const maxx = Math.min(vp.x1 - 1, Math.ceil(Math.max(x0, x1, x2)));
+  const miny = Math.max(vp.y0, Math.floor(Math.min(y0, y1, y2)));
+  const maxy = Math.min(vp.y1 - 1, Math.ceil(Math.max(y0, y1, y2)));
+  if (minx > maxx || miny > maxy) return;
+  const inv = 1 / area;
+  for (let y = miny; y <= maxy; y++) {
+    const py = y + 0.5, row = y * W;
+    for (let x = minx; x <= maxx; x++) {
+      const px = x + 0.5;
+      const e0 = (x2 - x1) * (py - y1) - (y2 - y1) * (px - x1); if (e0 < 0) continue;
+      const e1 = (x0 - x2) * (py - y2) - (y0 - y2) * (px - x2); if (e1 < 0) continue;
+      const e2 = area - e0 - e1; if (e2 < 0) continue;
+      const w = (e0 * w0 + e1 * w1 + e2 * w2) * inv;
+      const idx = row + x;
+      if (w > zb[idx]) { zb[idx] = w; fb[idx] = dith(I, x, y); }
+    }
+  }
+}
+
+function clipNear(p) {
+  const out = [];
+  for (let i = 0; i < p.length; i++) {
+    const A = p[i], B = p[(i + 1) % p.length];
+    const ai = A[2] >= NEAR, bi = B[2] >= NEAR;
+    if (ai) out.push(A);
+    if (ai !== bi) {
+      const t = (NEAR - A[2]) / (B[2] - A[2]);
+      out.push([A[0] + (B[0] - A[0]) * t, A[1] + (B[1] - A[1]) * t, NEAR]);
+    }
+  }
+  return out;
+}
+const PX = new Float64Array(8), PY = new Float64Array(8), PW = new Float64Array(8);
+function rasterTri(cv, a, b, c, I, vp) {
+  let pts = [[cv[a], cv[a+1], cv[a+2]], [cv[b], cv[b+1], cv[b+2]], [cv[c], cv[c+1], cv[c+2]]];
+  if (pts[0][2] < NEAR || pts[1][2] < NEAR || pts[2][2] < NEAR) pts = clipNear(pts);
+  const n = pts.length;
+  if (n < 3) return;
+  for (let i = 0; i < n; i++) {
+    const w = 1 / pts[i][2];
+    PW[i] = w; PX[i] = vp.cx + pts[i][0] * vp.F * w; PY[i] = vp.cy - pts[i][1] * vp.F * w;
+  }
+  for (let i = 1; i < n - 1; i++) fillTri(PX[0], PY[0], PW[0], PX[i], PY[i], PW[i], PX[i+1], PY[i+1], PW[i+1], I, vp);
+}
+
+function renderObjects(cam, list, vp, light) {
+  for (const o of list) {
+    const d = sub(o.pos, cam.pos);
+    const cz = dot(d, cam.f), cx = dot(d, cam.r), cy = dot(d, cam.u);
+    if (cz + o.radius < NEAR) continue;
+    const zz = Math.max(cz + o.radius, NEAR);
+    if (Math.abs(cx) - o.radius > zz * vp.tx || Math.abs(cy) - o.radius > zz * vp.ty) continue;
+    const m = o.mesh, nv = m.v.length;
+    if (!m.wv) { m.wv = new Float64Array(nv * 3); m.cv = new Float64Array(nv * 3); }
+    const wv = m.wv, cv = m.cv, s = o.s;
+    for (let i = 0; i < nv; i++) {
+      const p = m.v[i], lx = p[0] * s, ly = p[1] * s, lz = p[2] * s;
+      const wx = o.pos[0] + o.ax[0]*lx + o.ay[0]*ly + o.az[0]*lz;
+      const wy = o.pos[1] + o.ax[1]*lx + o.ay[1]*ly + o.az[1]*lz;
+      const wz = o.pos[2] + o.ax[2]*lx + o.ay[2]*ly + o.az[2]*lz;
+      const j = i * 3;
+      wv[j] = wx; wv[j+1] = wy; wv[j+2] = wz;
+      const rx = wx - cam.pos[0], ry = wy - cam.pos[1], rz = wz - cam.pos[2];
+      cv[j]   = rx*cam.r[0] + ry*cam.r[1] + rz*cam.r[2];
+      cv[j+1] = rx*cam.u[0] + ry*cam.u[1] + rz*cam.u[2];
+      cv[j+2] = rx*cam.f[0] + ry*cam.f[1] + rz*cam.f[2];
+    }
+    const F = m.f;
+    for (let k = 0; k < F.length; k += 4) {
+      const a = F[k]*3, b = F[k+1]*3, c = F[k+2]*3, al = F[k+3];
+      if (cv[a+2] < NEAR && cv[b+2] < NEAR && cv[c+2] < NEAR) continue;
+      const e1x = wv[b]-wv[a], e1y = wv[b+1]-wv[a+1], e1z = wv[b+2]-wv[a+2];
+      const e2x = wv[c]-wv[a], e2y = wv[c+1]-wv[a+1], e2z = wv[c+2]-wv[a+2];
+      let nx = e1y*e2z - e1z*e2y, ny = e1z*e2x - e1x*e2z, nz = e1x*e2y - e1y*e2x;
+      const nl = Math.hypot(nx, ny, nz); if (nl < 1e-12) continue;
+      nx /= nl; ny /= nl; nz /= nl;
+      let facing = nx*(cam.pos[0]-wv[a]) + ny*(cam.pos[1]-wv[a+1]) + nz*(cam.pos[2]-wv[a+2]);
+      if (m.convex) {
+        const ox = (wv[a]+wv[b]+wv[c])/3 - o.pos[0], oy = (wv[a+1]+wv[b+1]+wv[c+1])/3 - o.pos[1], oz = (wv[a+2]+wv[b+2]+wv[c+2])/3 - o.pos[2];
+        if (nx*ox + ny*oy + nz*oz < 0) { nx = -nx; ny = -ny; nz = -nz; facing = -facing; }
+        if (facing <= 0) continue;
+      } else if (facing < 0) { nx = -nx; ny = -ny; nz = -nz; }
+      let I;
+      if (al >= 2) I = al - 2;
+      else I = al * (AMB + DIF * Math.max(0, nx*light[0] + ny*light[1] + nz*light[2]));
+      rasterTri(cv, a, b, c, I, vp);
+    }
+  }
+}
+
+function camProject(cam, vp, p) {
+  const d = sub(p, cam.pos);
+  const z = dot(d, cam.f);
+  if (z < NEAR) return null;
+  const w = 1 / z;
+  return { x: vp.cx + dot(d, cam.r) * vp.F * w, y: vp.cy - dot(d, cam.u) * vp.F * w, w, z };
+}
+function inVP(vp, x, y) { return x >= vp.x0 && x < vp.x1 && y >= vp.y0 && y < vp.y1; }
+
+function renderStars(cam, vp) {
+  for (const [d, b] of STARS) {
+    const z = dot(d, cam.f); if (z <= 0.05) continue;
+    const x = Math.floor(vp.cx + dot(d, cam.r) * vp.F / z), y = Math.floor(vp.cy - dot(d, cam.u) * vp.F / z);
+    if (!inVP(vp, x, y)) continue;
+    const i = y * W + x;
+    if (zb[i] === 0 && fb[i] < b) fb[i] = b;
+  }
+}
+function renderSun(cam, vp) {
+  const z = dot(LIGHT, cam.f); if (z <= 0.05) return;
+  const sx = vp.cx + dot(LIGHT, cam.r) * vp.F / z, sy = vp.cy - dot(LIGHT, cam.u) * vp.F / z;
+  const R0 = 4.5, R1 = 11;
+  for (let y = Math.floor(sy - R1); y <= sy + R1; y++) for (let x = Math.floor(sx - R1); x <= sx + R1; x++) {
+    if (!inVP(vp, x, y)) continue;
+    const dd = Math.hypot(x + 0.5 - sx, y + 0.5 - sy);
+    if (dd > R1) continue;
+    const I = dd <= R0 ? 1 : 0.5 * (1 - (dd - R0) / (R1 - R0));
+    const c = dith(I, x, y), i = y * W + x;
+    if (fb[i] < c) fb[i] = c;
+  }
+}
+function wpoint(cam, vp, p, c, size) {
+  const q = camProject(cam, vp, p); if (!q) return;
+  const x0 = Math.floor(q.x - (size - 1) / 2), y0 = Math.floor(q.y - (size - 1) / 2);
+  for (let y = y0; y < y0 + size; y++) for (let x = x0; x < x0 + size; x++) {
+    if (!inVP(vp, x, y)) continue;
+    const i = y * W + x;
+    if (q.w >= zb[i] * 0.995) fb[i] = c;
+  }
+}
+
+// ===================== 2D drawing =====================
+const FONT = {
+  'A':'010101111101101','B':'110101110101110','C':'011100100100011','D':'110101101101110','E':'111100110100111',
+  'F':'111100110100100','G':'011100101101011','H':'101101111101101','I':'111010010010111','J':'001001001101010',
+  'K':'101101110101101','L':'100100100100111','M':'101111111101101','N':'110101101101101','O':'010101101101010',
+  'P':'110101110100100','Q':'010101101110011','R':'110101110101101','S':'011100010001110','T':'111010010010010',
+  'U':'101101101101111','V':'101101101101010','W':'101101111111101','X':'101101010101101','Y':'101101010010010',
+  'Z':'111001010100111','0':'111101101101111','1':'010110010010111','2':'110001010100111','3':'110001010001110',
+  '4':'101101111001001','5':'111100110001110','6':'011100111101111','7':'111001010010010','8':'111101111101111',
+  '9':'111101111001110',' ':'000000000000000','.':'000000000000010',':':'000010000010000','-':'000000111000000',
+  '/':'001001010100100','>':'100010001010100','<':'001010100010001','!':'010010010000010','%':'101001010100101',
+  '+':'000010111010000','?':'110001010000010',',':'000000000010100',
+};
+function pset(x, y, c) { if (x >= 0 && x < W && y >= 0 && y < H) fb[y * W + x] = c; }
+function rect(x, y, w, h, c) { for (let j = y; j < y + h; j++) for (let i = x; i < x + w; i++) pset(i, j, c); }
+function frame(x, y, w, h, c) { rect(x, y, w, 1, c); rect(x, y + h - 1, w, 1, c); rect(x, y, 1, h, c); rect(x + w - 1, y, 1, h, c); }
+function txt(s, x, y, c, sc = 1) {
+  for (const ch of s) {
+    const g = FONT[ch] || FONT['?'];
+    for (let r = 0; r < 5; r++) for (let q = 0; q < 3; q++)
+      if (g[r * 3 + q] === '1') rect(x + q * sc, y + r * sc, sc, sc, c);
+    x += 4 * sc;
+  }
+}
+const txtW = (s, sc = 1) => s.length * 4 * sc - sc;
+const txtC = (s, cx, y, c, sc = 1) => txt(s, Math.round(cx - txtW(s, sc) / 2), y, c, sc);
+function line(x0, y0, x1, y1, c) {
+  const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0), 1);
+  for (let i = 0; i <= n; i++) pset(Math.round(x0 + (x1 - x0) * i / n), Math.round(y0 + (y1 - y0) * i / n), c);
+}
+function circle(cx, cy, r, c) {
+  for (let a = 0; a < 64; a++) { const t = a / 64 * Math.PI * 2; pset(Math.round(cx + Math.cos(t) * r), Math.round(cy + Math.sin(t) * r), c); }
+}
+function msgBox(s, cy) {
+  const w = txtW(s) + 8, x = Math.round(80 - w / 2);
+  rect(x, cy - 2, w, 9, 3); frame(x - 1, cy - 3, w + 2, 11, 0); txt(s, x + 4, cy, 0);
+}
+const pad = (n, k) => String(Math.max(0, Math.floor(n))).padStart(k, '0');
+
+// ===================== game state =====================
+const MAXSPD = 100, DOCK_SPEED = 25;
+const CARGO = ['MEDICINE', 'ICE CORES', 'SEED BANK', 'MAIL BAGS', 'SPARE PARTS', 'TEA LEAVES', 'ROBOT PETS', 'STAR MAPS'];
+const PALS = [
+  { name: 'GREEN',  c: [[15,56,15],[48,98,48],[139,172,15],[155,188,15]] },
+  { name: 'SILVER', c: [[24,24,26],[86,88,92],[166,168,170],[226,226,222]] },
+  { name: 'NIGHT',  c: [[10,14,40],[40,62,120],[110,156,214],[214,234,255]] },
+  { name: 'AMBER',  c: [[36,18,4],[120,58,10],[214,138,40],[255,214,140]] },
+];
+const jobRng = rng(42);
+
+const G = {
+  state: 'title', t: 0, blink: 0, pal: 0,
+  ship: { pos: [0,0,0], r: [1,0,0], u: [0,1,0], f: [0,0,1], speed: 0, fuel: 100, hull: 100, pv: 0, yv: 0, rv: 0, lowFuelWarned: false },
+  credits: 0, delivered: 0, job: null, port: 0, lastPort: 0, target: 1,
+  msg: '', msgT: 0, shake: 0, lostMsg: '', lostT: 0, dockEvent: [], crateA: 0,
+  dust: [],
+};
+try { const p = parseInt(localStorage.getItem('orbitpost.pal'), 10); if (p >= 0 && p < PALS.length) G.pal = p; } catch (e) {}
+function setPal(p) { G.pal = p % PALS.length; try { localStorage.setItem('orbitpost.pal', String(G.pal)); } catch (e) {} }
+
+function newJob(from) {
+  return { cargo: CARGO[(jobRng() * CARGO.length) | 0], to: 1 - from, pay: 100 + 10 * ((jobRng() * 9) | 0) };
+}
+function say(s, t = 1.6) { G.msg = s; G.msgT = t; }
+
+function startGame() {
+  G.credits = 0; G.delivered = 0;
+  G.job = { cargo: 'MEDICINE', to: 1, pay: 120 };
+  dockAt(0, ['WELCOME, PILOT.', 'FIRST JOB IS READY.']);
+  tone(523, 0.08); tone(784, 0.12, 'square', 0.04, 0.08);
+}
+function dockAt(idx, events) {
+  const s = G.ship;
+  G.state = 'docked'; G.port = idx; G.lastPort = idx;
+  s.speed = 0; s.fuel = 100; s.hull = 100; s.lowFuelWarned = false;
+  G.dockEvent = events;
+}
+function dock(idx) {
+  if (G.job && G.job.to === idx) {
+    const pay = G.job.pay;
+    G.credits += pay; G.delivered++;
+    G.job = newJob(idx);
+    dockAt(idx, ['DELIVERED!', '+' + pay + 'CR']);
+    [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.1, 'square', 0.04, i * 0.09));
+  } else {
+    dockAt(idx, ['DOCKED.', 'NO CARGO FOR HERE.']);
+    tone(659, 0.08); tone(523, 0.1, 'square', 0.04, 0.08);
+  }
+}
+function launch() {
+  const P = PORTS[G.port], o = P.obj, s = G.ship;
+  const b = basisFrom(o.az);
+  s.pos = add(o.pos, mul(o.az, P.hub[5] + 45));
+  s.r = b.r; s.u = b.u; s.f = b.f;
+  s.speed = 12; s.pv = s.yv = s.rv = 0;
+  G.target = G.job ? G.job.to : 1 - G.port;
+  G.state = 'flight';
+  initDust();
+  say('LAUNCH!', 1.2);
+  tone(392, 0.06); tone(587, 0.1, 'square', 0.04, 0.06);
+}
+function lose(msg) {
+  G.state = 'lost'; G.lostMsg = msg; G.lostT = 3; G.ship.speed = 0; G.shake = 0.5;
+  [330, 262, 196, 147].forEach((f, i) => tone(f, 0.16, 'square', 0.05, i * 0.14));
+}
+function tow() {
+  G.credits = Math.max(0, G.credits - 50);
+  dockAt(G.lastPort, ['TOWED BACK.', '-50CR TOW FEE']);
+}
+
+function initDust() {
+  const R = rng((G.t * 1000) | 0);
+  G.dust = [];
+  for (let i = 0; i < 70; i++) G.dust.push(add(G.ship.pos, [R() * 120 - 60, R() * 120 - 60, R() * 120 - 60]));
+}
+
+function worldTick(dt) {
+  planet.ax = rot(planet.ax, planet.spinAxis, planet.spinW * dt); planet.ay = rot(planet.ay, planet.spinAxis, planet.spinW * dt); planet.az = rot(planet.az, planet.spinAxis, planet.spinW * dt);
+  moon.ax = rot(moon.ax, moon.spinAxis, moon.spinW * dt); moon.ay = rot(moon.ay, moon.spinAxis, moon.spinW * dt); moon.az = rot(moon.az, moon.spinAxis, moon.spinW * dt);
+  station.ax = rot(station.ax, station.az, station.spinW * dt); station.ay = rot(station.ay, station.az, station.spinW * dt);
+  for (const a of asteroids) {
+    const w = a.spinW * dt;
+    a.ax = rot(a.ax, a.spinAxis, w); a.ay = rot(a.ay, a.spinAxis, w); a.az = rot(a.az, a.spinAxis, w);
+  }
+  if (((G.t * 10) | 0) % 20 === 0) { orthoObj(station); orthoObj(planet); orthoObj(moon); asteroids.forEach(orthoObj); }
+}
+
+function toLocal(o, p) { const d = sub(p, o.pos); return [dot(d, o.ax) / o.s, dot(d, o.ay) / o.s, dot(d, o.az) / o.s]; }
+function inBox(l, b, m) { return l[0] > b[0]-m && l[0] < b[3]+m && l[1] > b[1]-m && l[1] < b[4]+m && l[2] > b[2]-m && l[2] < b[5]+m; }
+function hit(dmg, msg) {
+  G.ship.hull -= dmg; G.shake = 0.35; say(msg);
+  tone(110, 0.18, 'sawtooth', 0.06); tone(70, 0.2, 'square', 0.05, 0.05);
+}
+function doorPoint(P) { return add(P.obj.pos, mul(P.obj.az, P.hub[5] + 1)); }
+
+function flight(dt) {
+  const s = G.ship;
+  if (pressed('start')) { G.state = 'pause'; tone(440, 0.06); return; }
+  if (pressed('select')) { G.target = 1 - G.target; tone(880, 0.05); }
+
+  const lr = (K.right ? 1 : 0) - (K.left ? 1 : 0), ud = (K.up ? 1 : 0) - (K.down ? 1 : 0);
+  const rolling = K.b && lr !== 0;
+  const k = Math.min(1, dt * 7);
+  s.yv += ((rolling ? 0 : lr * 1.1) - s.yv) * k;
+  s.rv += ((rolling ? lr * 1.8 : 0) - s.rv) * k;
+  s.pv += (ud * 0.95 - s.pv) * k;
+  let a = s.pv * dt;
+  if (a) { const f = s.f, u = s.u, c = Math.cos(a), si = Math.sin(a); s.f = add(mul(f, c), mul(u, si)); s.u = sub(mul(u, c), mul(f, si)); }
+  a = s.yv * dt;
+  if (a) { const f = s.f, r = s.r, c = Math.cos(a), si = Math.sin(a); s.f = add(mul(f, c), mul(r, si)); s.r = sub(mul(r, c), mul(f, si)); }
+  a = s.rv * dt;
+  if (a) { const u = s.u, r = s.r, c = Math.cos(a), si = Math.sin(a); s.u = add(mul(u, c), mul(r, si)); s.r = sub(mul(r, c), mul(u, si)); }
+  s.f = norm(s.f); s.r = norm(cross(s.u, s.f)); s.u = cross(s.f, s.r);
+
+  if (K.a && s.fuel > 0) { s.speed += 45 * dt; s.fuel -= 2.5 * dt; }
+  if (K.b && !rolling) s.speed -= 60 * dt;
+  if (s.fuel <= 0) s.speed -= 6 * dt;
+  s.speed = clamp(s.speed, 0, MAXSPD);
+  s.fuel = Math.max(0, s.fuel - s.speed * 0.012 * dt);
+  if (s.fuel < 25 && !s.lowFuelWarned) { s.lowFuelWarned = true; say('LOW FUEL', 2); tone(988, 0.08); tone(988, 0.08, 'square', 0.04, 0.16); }
+
+  const prev = s.pos;
+  s.pos = add(s.pos, mul(s.f, s.speed * dt));
+
+  // spheres: planet, moon, asteroids
+  for (const b of BODIES) {
+    const d = sub(s.pos, b.pos), dl = len(d);
+    if (dl < b.cr + 3) {
+      s.pos = add(b.pos, mul(d, (b.cr + 3.5) / (dl || 1)));
+      if (b.big) { hit(30, 'TOO CLOSE!'); s.speed = 0; }
+      else { hit(6 + s.speed * 0.3, 'COLLISION'); s.speed *= 0.25; }
+    }
+  }
+  // docks
+  for (let i = 0; i < PORTS.length; i++) {
+    const P = PORTS[i], o = P.obj;
+    if (len(sub(s.pos, o.pos)) > o.radius + 10) continue;
+    const lp = toLocal(o, s.pos), pp = toLocal(o, prev);
+    let crash = false;
+    if (inBox(lp, P.hub, 2)) {
+      const fromFront = pp[2] >= P.hub[5] + 1.5;
+      if (fromFront && Math.hypot(lp[0], lp[1]) < P.door) {
+        if (s.speed <= DOCK_SPEED && -dot(s.f, o.az) > 0.8) { dock(i); return; }
+        say(s.speed > DOCK_SPEED ? 'TOO FAST!' : 'BAD ANGLE!');
+      }
+      crash = true;
+    }
+    if (!crash) for (const b of P.boxes) if (inBox(lp, b, 2)) { crash = true; break; }
+    if (!crash && P.torus && Math.hypot(Math.hypot(lp[0], lp[1]) - P.torus.R, lp[2]) < P.torus.r + 2) crash = true;
+    if (crash) {
+      const dmg = 5 + s.speed * 0.3;
+      s.pos = sub(prev, mul(s.f, 1.5)); s.speed = 0;
+      s.hull -= dmg; G.shake = 0.35; if (G.msgT <= 0 || G.msg === 'LAUNCH!') say('COLLISION');
+      tone(110, 0.18, 'sawtooth', 0.06);
+    }
+  }
+
+  // space dust wraps around the ship
+  for (const p of G.dust) for (let j = 0; j < 3; j++) {
+    const d = p[j] - s.pos[j];
+    if (d > 60) p[j] -= 120; else if (d < -60) p[j] += 120;
+  }
+
+  if (s.hull <= 0) { s.hull = 0; lose('SHIP LOST'); }
+  else if (s.fuel <= 0 && s.speed < 0.5) lose('OUT OF FUEL');
+}
+
+// ===================== screens =====================
+function shipCam() { const s = G.ship; return { pos: s.pos, r: s.r, u: s.u, f: s.f }; }
+
+function renderSpace(cam, vp) {
+  clearVP(vp, 0);
+  renderStars(cam, vp);
+  renderSun(cam, vp);
+  renderObjects(cam, SCENE, vp, LIGHT);
+}
+
+function renderFlight() {
+  const s = G.ship;
+  const shake = G.shake > 0 ? 1 : 0;
+  const vp = shake ? Object.assign({}, VP_FLIGHT, { cx: VP_FLIGHT.cx + (Math.random() * 3 - 1.5), cy: VP_FLIGHT.cy + (Math.random() * 3 - 1.5) }) : VP_FLIGHT;
+  const cam = shipCam();
+  renderSpace(cam, vp);
+
+  // dust streaks
+  for (const p of G.dust) {
+    const q = camProject(cam, vp, p); if (!q) continue;
+    const tail = camProject(cam, vp, sub(p, mul(s.f, Math.max(0.3, s.speed * 0.05))));
+    const c = q.z < 25 ? 3 : q.z < 45 ? 2 : 1;
+    const x0 = q.x, y0 = q.y, x1 = tail ? tail.x : q.x, y1 = tail ? tail.y : q.y;
+    const n = Math.max(1, Math.ceil(Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0))));
+    for (let i = 0; i <= n; i++) {
+      const x = Math.floor(x0 + (x1 - x0) * i / n), y = Math.floor(y0 + (y1 - y0) * i / n);
+      if (!inVP(vp, x, y)) continue;
+      const k = y * W + x; if (q.w >= zb[k] && fb[k] < c) fb[k] = c;
+    }
+  }
+
+  // dock beacons and approach lights
+  const tick = (G.t * 6) | 0;
+  for (const P of PORTS) {
+    const o = P.obj, dist = len(sub(o.pos, s.pos));
+    if (dist > 900) continue;
+    const toW = l => add(o.pos, add(add(mul(o.ax, l[0]), mul(o.ay, l[1])), mul(o.az, l[2])));
+    if ((tick & 2) === 0) for (const l of P.lights) wpoint(cam, vp, toW(l), 3, dist < 120 ? 2 : 1);
+    for (let k = 1; k <= 4; k++) {
+      if ((tick % 4) !== 4 - k) continue;
+      const z = P.hub[5] + 45 * k;
+      for (const [x, y] of [[-16, -16], [16, -16], [16, 16], [-16, 16]]) wpoint(cam, vp, toW([x, y, z]), 3, len(sub(toW([x, y, z]), s.pos)) < 80 ? 2 : 1);
+    }
+  }
+
+  // crosshair
+  for (const [dx, dy] of [[-3,0],[-2,0],[2,0],[3,0],[0,-3],[0,-2],[0,2],[0,3]]) pset(80 + dx, 60 + dy, 2);
+
+  // nav target
+  const T = PORTS[G.target], tdist = len(sub(T.obj.pos, s.pos));
+  const tp = tdist < 400 ? doorPoint(T) : T.obj.pos;
+  const tv = sub(tp, s.pos), lx = dot(tv, s.r), ly = dot(tv, s.u), lz = dot(tv, s.f);
+  const q = lz > NEAR ? { x: vp.cx + lx * vp.F / lz, y: vp.cy - ly * vp.F / lz } : null;
+  if (q && q.x > 3 && q.x < 157 && q.y > 3 && q.y < VH - 3) {
+    const rr = tdist < 400 ? 12 : T.obj.radius;
+    const sz = Math.round(clamp(rr * vp.F / lz, 3, 34));
+    const c = G.blink ? 3 : 2, x0 = Math.round(q.x - sz), x1 = Math.round(q.x + sz), y0 = Math.round(q.y - sz), y1 = Math.round(q.y + sz);
+    for (const [x, y, sx, sy] of [[x0, y0, 1, 1], [x1, y0, -1, 1], [x0, y1, 1, -1], [x1, y1, -1, -1]]) {
+      for (let i = 0; i < 3; i++) { pset(x + sx * i, y, c); pset(x, y + sy * i, c); }
+    }
+  } else {
+    let dx = lx, dy = -ly;
+    if (Math.hypot(dx, dy) < 1e-3) { dx = 0; dy = 1; }
+    const l = Math.hypot(dx, dy); dx /= l; dy /= l;
+    const t = Math.min((80 - 7) / Math.max(Math.abs(dx), 1e-6), (60 - 7) / Math.max(Math.abs(dy), 1e-6));
+    const px = 80 + dx * t, py = 60 + dy * t;
+    if (G.blink || lz > 0) {
+      const tipx = px + dx * 4, tipy = py + dy * 4, bx = px - dx * 2, by = py - dy * 2;
+      const big = 1e9, I = 1, vpA = { x0: 0, y0: 0, x1: W, y1: VH };
+      fillTri(tipx, tipy, big, bx - dy * 3.5, by + dx * 3.5, big, bx + dy * 3.5, by - dx * 3.5, big, I, vpA);
+    }
+  }
+
+  // docking guide
+  for (const P of PORTS) {
+    const o = P.obj;
+    if (len(sub(o.pos, s.pos)) > 340) continue;
+    const lp = toLocal(o, s.pos);
+    if (lp[2] < P.hub[5]) continue;
+    const align = -dot(s.f, o.az), lat = Math.hypot(lp[0], lp[1]);
+    let word = 'DOCK OK';
+    if (s.speed > DOCK_SPEED) word = 'SLOW DOWN';
+    else if (align < 0.8) word = 'ALIGN';
+    else if (lat > P.door - 1) word = 'CENTER';
+    const w = txtW(word) + 6, x = 80 - Math.round(w / 2);
+    if (word === 'DOCK OK' && !G.blink) { frame(x, 2, w, 9, 3); txt(word, x + 3, 4, 3); }
+    else { rect(x, 2, w, 9, 3); txt(word, x + 3, 4, 0); }
+    break;
+  }
+
+  if (G.msgT > 0 && G.state === 'flight') msgBox(G.msg, 40);
+  drawHUD();
+}
+
+function bar(x, y, w, frac, warn) {
+  frame(x, y, w, 5, 0);
+  rect(x + 1, y + 1, w - 2, 3, 3);
+  const n = Math.round((w - 2) * clamp(frac, 0, 1));
+  rect(x + 1, y + 1, n, 3, warn && frac < 0.25 && G.blink ? 0 : 1);
+}
+function drawHUD() {
+  const s = G.ship;
+  rect(0, VH, W, H - VH, 3);
+  rect(0, VH, W, 1, 0);
+  rect(0, VH + 1, W, 1, 2);
+  txt('SPD', 2, 124, 0);  bar(20, 124, 32, s.speed / MAXSPD, false);
+  txt('FUEL', 2, 131, 0); bar(20, 131, 32, s.fuel / 100, true);
+  txt('HULL', 2, 138, 0); bar(20, 138, 32, s.hull / 100, true);
+
+  // radar: where the target is relative to the nose
+  const cx = 65, cy = 133;
+  circle(cx, cy, 9, 1);
+  pset(cx, cy, 2);
+  const T = PORTS[G.target];
+  const v = norm(sub(T.obj.pos, s.pos));
+  const vx = dot(v, s.r), vy = dot(v, s.u), vz = dot(v, s.f);
+  const px = Math.round(cx + vx * 8), py = Math.round(cy - vy * 8);
+  if (vz >= 0) rect(px - 1, py - 1, 2, 2, 0);
+  else if (G.blink) { frame(px - 1, py - 1, 3, 3, 0); }
+
+  const isJob = G.job && G.job.to === G.target;
+  txt((isJob ? '>' : ' ') + T.name, 78, 124, 0);
+  txt('DIST ' + pad(Math.min(9999, len(sub(T.obj.pos, s.pos))), 4), 82, 131, 1);
+  txt('CR ' + pad(G.credits, 4), 82, 138, 0);
+  if (G.job) rect(116, 138, 5, 5, 1), rect(117, 139, 3, 3, 2), pset(118, 138, 0), pset(118, 142, 0);
+}
+
+function renderTitle() {
+  const a = G.t * 0.12;
+  const pos = add(station.pos, [Math.sin(a) * 240, 40 + Math.sin(a * 0.7) * 25, Math.cos(a) * 240]);
+  const b = basisFrom(sub(add(station.pos, [0, 38, 0]), pos));
+  renderSpace({ pos, r: b.r, u: b.u, f: b.f }, VP_TITLE);
+  for (const [dx, dy] of [[-1,0],[1,0],[0,-1],[0,1],[1,1],[2,2]]) txtC('ORBIT POST', 80 + dx, 16 + dy, 0, 2);
+  txtC('ORBIT POST', 80, 16, 3, 2);
+  for (const [dx, dy] of [[-1,0],[1,0],[0,-1],[0,1]]) txtC('SPACE COURIER', 80 + dx, 32 + dy, 0);
+  txtC('SPACE COURIER', 80, 32, 2);
+  if (G.blink) { for (const [dx, dy] of [[-1,0],[1,0],[0,-1],[0,1]]) txtC('PRESS START', 80 + dx, 124 + dy, 0); txtC('PRESS START', 80, 124, 3); }
+  txtC('PROTOTYPE', 80, 136, 1);
+}
+
+function renderDocked() {
+  rect(0, 0, W, H, 3);
+  const P = PORTS[G.port];
+  rect(0, 0, W, 11, 0);
+  txt(P.name, 4, 3, 3);
+  txt('DOCK', 156 - txtW('DOCK'), 3, 2);
+  let y = 16;
+  for (const l of G.dockEvent) { txt(l, 4, y, 0); y += 7; }
+  txt('FUEL 100%', 4, 33, 1);
+  txt('HULL 100%', 4, 40, 1);
+  for (let x = 4; x < 98; x += 2) pset(x, 50, 1);
+  if (G.job) {
+    txt('NEXT JOB', 4, 55, 1);
+    txt(G.job.cargo, 4, 63, 0);
+    txt('TO ' + PORTS[G.job.to].name, 4, 71, 0);
+    txt('PAY ' + G.job.pay + 'CR', 4, 79, 0);
+  }
+  // cargo window with the parcel
+  frame(102, 26, 56, 68, 0);
+  clearVP(VP_CRATE, 0);
+  for (let i = 0; i < 18; i++) { const x = 104 + ((i * 37) % 52), yy = 28 + ((i * 23) % 64); fb[yy * W + x] = 1; }
+  const ang = G.crateA;
+  const az = rot(rot([0, 0, 1], [0, 1, 0], ang), [1, 0, 0], 0.45), ay = rot(rot([0, 1, 0], [0, 1, 0], ang), [1, 0, 0], 0.45);
+  crate.az = az; crate.ay = ay; crate.ax = cross(ay, az);
+  renderObjects({ pos: [0, 0, -62], r: [1, 0, 0], u: [0, 1, 0], f: [0, 0, 1] }, [crate], VP_CRATE, norm([0.5, 0.7, -0.6]));
+  txtC('CARGO', 130, 97, 1);
+
+  rect(0, 108, W, 1, 0);
+  txt('CR ' + pad(G.credits, 4), 4, 113, 0);
+  txt('DONE ' + pad(G.delivered, 2), 156 - txtW('DONE 00'), 113, 0);
+  if (G.blink) { rect(46, 126, 68, 11, 0); txtC('A: LAUNCH', 80, 129, 3); }
+  else txtC('A: LAUNCH', 80, 129, 0);
+}
+
+function renderPause() {
+  renderFlight();
+  rect(30, 40, 100, 40, 3); frame(29, 39, 102, 42, 0); frame(31, 41, 98, 38, 1);
+  txtC('PAUSE', 80, 46, 0);
+  txtC('< ' + PALS[G.pal].name + ' >', 80, 58, 0);
+  txtC('START: RESUME', 80, 70, 1);
+}
+function renderLost() {
+  renderFlight();
+  msgBox(G.lostMsg, 40);
+  if (G.blink) msgBox('CALLING TUG...', 54);
+}
+
+// ===================== input =====================
+const KEYS = ['up', 'down', 'left', 'right', 'a', 'b', 'start', 'select'];
+const KB = {}, TB = {}, TAP = {}, K = {}, PREV = {};   // TAP keeps a quick tap alive until one update has seen it
+KEYS.forEach(k => { KB[k] = TB[k] = TAP[k] = K[k] = PREV[k] = false; });
+const pressed = k => K[k] && !PREV[k];
+const KEYMAP = {
+  ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right',
+  KeyZ: 'a', KeyJ: 'a', Space: 'a', KeyX: 'b', KeyK: 'b', Enter: 'start', ShiftLeft: 'select', ShiftRight: 'select', Backspace: 'select',
+};
+window.addEventListener('keydown', e => {
+  const k = KEYMAP[e.code]; if (!k) return;
+  e.preventDefault(); if (!e.repeat) TAP[k] = true; KB[k] = true; audioInit();
+});
+window.addEventListener('keyup', e => { const k = KEYMAP[e.code]; if (k) { e.preventDefault(); KB[k] = false; } });
+window.addEventListener('blur', () => KEYS.forEach(k => { KB[k] = false; TB[k] = false; }));
+
+document.querySelectorAll('[data-btn]').forEach(el => {
+  const k = el.dataset.btn;
+  const on = e => { e.preventDefault(); TB[k] = true; TAP[k] = true; el.classList.add('on'); audioInit(); try { el.setPointerCapture(e.pointerId); } catch (_) {} };
+  const off = () => { TB[k] = false; el.classList.remove('on'); };
+  el.addEventListener('pointerdown', on);
+  el.addEventListener('pointerup', off);
+  el.addEventListener('pointercancel', off);
+  el.addEventListener('lostpointercapture', off);
+  el.addEventListener('contextmenu', e => e.preventDefault());
+});
+const dpad = document.getElementById('dpad');
+const arrows = {}; dpad.querySelectorAll('.arrow').forEach(a => { arrows[a.dataset.dir] = a; });
+let dpadPointer = null;
+function dpadSet(e) {
+  const r = dpad.getBoundingClientRect();
+  const dx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2), dy = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+  const dz = 0.22;
+  const was = { up: TB.up, down: TB.down, left: TB.left, right: TB.right };
+  TB.left = dx < -dz && Math.abs(dx) > Math.abs(dy) * 0.45;
+  TB.right = dx > dz && Math.abs(dx) > Math.abs(dy) * 0.45;
+  TB.up = dy < -dz && Math.abs(dy) > Math.abs(dx) * 0.45;
+  TB.down = dy > dz && Math.abs(dy) > Math.abs(dx) * 0.45;
+  for (const d of ['up', 'down', 'left', 'right']) { if (TB[d] && !was[d]) TAP[d] = true; arrows[d].classList.toggle('on', TB[d]); }
+}
+function dpadOff() { dpadPointer = null; for (const d of ['up', 'down', 'left', 'right']) { TB[d] = false; arrows[d].classList.remove('on'); } }
+dpad.addEventListener('pointerdown', e => { e.preventDefault(); dpadPointer = e.pointerId; audioInit(); try { dpad.setPointerCapture(e.pointerId); } catch (_) {} dpadSet(e); });
+dpad.addEventListener('pointermove', e => { if (e.pointerId === dpadPointer) dpadSet(e); });
+dpad.addEventListener('pointerup', e => { if (e.pointerId === dpadPointer) dpadOff(); });
+dpad.addEventListener('pointercancel', dpadOff);
+dpad.addEventListener('lostpointercapture', dpadOff);
+dpad.addEventListener('contextmenu', e => e.preventDefault());
+
+// ===================== sound =====================
+let AC = null;
+function audioInit() {
+  try {
+    if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+    else if (AC.state === 'suspended') AC.resume();
+  } catch (e) { AC = null; }
+}
+function tone(f, d, type = 'square', v = 0.04, when = 0) {
+  if (!AC) return;
+  try {
+    const t0 = AC.currentTime + when, o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.value = f;
+    g.gain.setValueAtTime(v, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+    o.connect(g); g.connect(AC.destination); o.start(t0); o.stop(t0 + d + 0.02);
+  } catch (e) {}
+}
+
+// ===================== main loop =====================
+const canvas = document.getElementById('lcd');
+const ctx = canvas.getContext('2d');
+const img = ctx.createImageData(W, H);
+function blit() {
+  const p = PALS[G.pal].c, d = img.data;
+  for (let i = 0, j = 0; i < W * H; i++, j += 4) { const c = p[fb[i]]; d[j] = c[0]; d[j+1] = c[1]; d[j+2] = c[2]; d[j+3] = 255; }
+  ctx.putImageData(img, 0, 0);
+}
+function update(dt) {
+  for (const k of KEYS) { K[k] = KB[k] || TB[k] || TAP[k]; TAP[k] = false; }
+  G.t += dt; G.blink = ((G.t * 3) | 0) & 1;
+  worldTick(dt);
+  if (G.msgT > 0) G.msgT -= dt;
+  if (G.shake > 0) G.shake -= dt;
+  switch (G.state) {
+    case 'title': if (pressed('start') || pressed('a')) startGame(); break;
+    case 'docked': G.crateA += dt * 0.9; if (pressed('a') || pressed('start')) launch(); break;
+    case 'flight': flight(dt); break;
+    case 'pause':
+      if (pressed('start')) { G.state = 'flight'; tone(440, 0.06); }
+      if (pressed('left')) { setPal(G.pal + PALS.length - 1); tone(660, 0.04); }
+      if (pressed('right')) { setPal(G.pal + 1); tone(660, 0.04); }
+      break;
+    case 'lost': G.lostT -= dt; if (G.lostT <= 0) tow(); break;
+  }
+  for (const k of KEYS) PREV[k] = K[k];
+}
+function render() {
+  switch (G.state) {
+    case 'title': renderTitle(); break;
+    case 'docked': renderDocked(); break;
+    case 'flight': renderFlight(); break;
+    case 'pause': renderPause(); break;
+    case 'lost': renderLost(); break;
+  }
+  blit();
+}
+let last = performance.now(), acc = 0;
+const FRAME = 1 / 30;   // the LCD refreshes at 30 fps on purpose
+function loop(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  update(dt);
+  acc += dt;
+  if (acc >= FRAME - 0.002) { acc = Math.min(acc - FRAME, FRAME); render(); }
+  requestAnimationFrame(loop);
+}
+render();
+requestAnimationFrame(loop);
+
+// keep the LCD at a whole-number zoom when there is room for one
+const screenEl = document.getElementById('screen');
+function fit() {
+  const avail = screenEl.clientWidth;
+  const z = avail >= 320 ? Math.floor(avail / 160) : avail / 160;
+  canvas.style.width = (160 * z) + 'px';
+  canvas.style.height = (144 * z) + 'px';
+}
+new ResizeObserver(fit).observe(screenEl);
+fit();
+canvas.addEventListener('pointerdown', () => { audioInit(); window.focus(); });
+
+// test hook
+window.OrbitPost = { G, PORTS, update, render, fb };
+})();
+</script>
