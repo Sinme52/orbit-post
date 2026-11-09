@@ -166,8 +166,8 @@ kbd{
     <h2>操作</h2>
     <table class="keys">
       <tr><td><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 十字キー</td><td>機首の上下・左右</td></tr>
-      <tr><td><kbd>Z</kbd> A</td><td>加速（燃料を使う）</td></tr>
-      <tr><td><kbd>X</kbd> B</td><td>減速</td></tr>
+      <tr><td><kbd>Z</kbd> A</td><td>加速（スラスター噴射。燃料を使う）</td></tr>
+      <tr><td><kbd>X</kbd> B</td><td>減速（逆噴射。燃料を使う）</td></tr>
       <tr><td><kbd>X</kbd>＋<kbd>←</kbd><kbd>→</kbd></td><td>ロール（機体を傾ける）</td></tr>
       <tr><td><kbd>Shift</kbd> SELECT</td><td>目標の切り替え。タイトルではBGMのオン・オフ</td></tr>
       <tr><td><kbd>Enter</kbd> START</td><td>一時停止。上下で項目、左右で画面の色とBGMを切り替え</td></tr>
@@ -186,6 +186,7 @@ kbd{
     <h2>遊び方</h2>
     <ol>
       <li>ドックで荷物を受け取り、A で発進します。各ステージで3件届けるとクリアし、ワープで次の星系へ進みます。</li>
+      <li>燃料はスラスターを噴いて速度を変えたときだけ減ります。巡航中は減りませんが、止まるにも燃料が要ります。燃料ゲージの縦線は「今の速度から止まるのに必要な量」です。燃料が切れると止まれずに漂います。8秒以内にドックへ入れないと給油船が来て、その場で40%まで給油してくれます（30CR）。</li>
       <li>画面の囲みか端の矢印、下のレーダーを頼りに目的地へ向かいます。惑星や恒星、ブラックホールが間にあるときは、目印が ◇ に変わって回り道を案内します。</li>
       <li>ドックの正面に点滅する誘導灯が並んでいます。速度 25 以下で、扉の中心へまっすぐ入るとドッキング成功です。</li>
       <li>画面上の表示 <span class="hud-words">SLOW DOWN / ALIGN / CENTER / DOCK OK</span> を見ながら寄せてください。</li>
@@ -937,6 +938,9 @@ function sweep(f0, f1, d, v = 0.04) {
 
 // ===================== game state =====================
 const MAXSPD = 100, DOCK_SPEED = 25;
+// Fuel works like a thruster: only changing speed (A to speed up, B to slow down) burns it.
+// Coasting at any speed is free. FUEL_PER_DV = tank % per unit of speed change.
+const FUEL_PER_DV = 0.25, NO_FUEL_WAIT = 8, TANKER_FUEL = 40, TANKER_FEE = 30;
 const CARGO = ['MEDICINE', 'ICE CORES', 'SEED BANK', 'MAIL BAGS', 'SPARE PARTS', 'TEA LEAVES', 'ROBOT PETS', 'STAR MAPS', 'TELESCOPE', 'BIRTHDAY CAKE'];
 const PALS = [
   { name: 'GREEN',  c: [[15,56,15],[48,98,48],[139,172,15],[155,188,15]] },
@@ -950,7 +954,7 @@ const G = {
   state: 'title', t: 0, blink: 0, pal: 0, musicOn: true, psel: 0,
   ship: { pos: [0,0,0], r: [1,0,0], u: [0,1,0], f: [0,0,1], speed: 0, fuel: 100, hull: 100, pv: 0, yv: 0, rv: 0, drift: [0, 0, 0], lowFuelWarned: false },
   credits: 0, delivered: 0, job: null, port: 0, lastPort: 0, target: 1,
-  stage: 0, sel: 0, unlocked: 1, stageDone: 0, cleared: false, heat: 0, grav: 0, endT: 0, cardT: -1, bump: 0,
+  stage: 0, sel: 0, unlocked: 1, stageDone: 0, cleared: false, heat: 0, grav: 0, endT: 0, cardT: -1, bump: 0, noFuelT: 0,
   msg: '', msgT: 0, shake: 0, lostMsg: '', lostT: 0, dockEvent: [], crateA: 0, warpT: 0,
   dust: [],
 };
@@ -1014,7 +1018,7 @@ function launch() {
   s.r = b.r; s.u = b.u; s.f = b.f;
   s.speed = 12; s.pv = s.yv = s.rv = 0; s.drift = [0, 0, 0];
   G.target = G.job ? G.job.to : (G.port + 1) % STAGE.ports.length;
-  G.state = 'flight'; G.bump = 0; G.route = null;
+  G.state = 'flight'; G.bump = 0; G.route = null; G.noFuelT = 0;
   updateNav(0);
   initDust();
   say('LAUNCH!', 1.2);
@@ -1068,14 +1072,14 @@ function hit(dmg, msg) {
   tone(110, 0.18, 'sawtooth', 0.06); tone(70, 0.2, 'square', 0.05, 0.05);
 }
 function doorPoint(P) { return add(P.obj.pos, mul(P.obj.az, P.hub[5] + 1)); }
-function approachPoint(P) { return add(P.obj.pos, mul(P.obj.az, P.hub[5] + 150)); }
+function approachPoint(P) { return add(P.obj.pos, mul(P.obj.az, P.hub[5] + 170)); }
 
 // ----- navigation: the on-screen marker leads around planets, the sun's heat, the black hole and docks -----
 function navDangers() {
   const S = STAGE, out = [];
   for (const b of S.bodies) if (b.big) out.push([b.pos, b.fatal ? 1000 : b.cr + 120]);
   if (S.heat) out.push([S.heat.c, S.heat.r0 + 40]);
-  for (const P of S.ports) out.push([P.obj.pos, P.obj.radius + 40]);
+  for (const P of S.ports) out.push([P.obj.pos, P.obj.radius + 90]);
   return out;
 }
 function segBlock(a, b, dangers) {
@@ -1145,11 +1149,15 @@ function flight(dt) {
   if (a) { const u = s.u, r = s.r, c = Math.cos(a), si = Math.sin(a); s.u = add(mul(u, c), mul(r, si)); s.r = sub(mul(r, c), mul(u, si)); }
   s.f = norm(s.f); s.r = norm(cross(s.u, s.f)); s.u = cross(s.f, s.r);
 
-  if (K.a && s.fuel > 0) { s.speed += 45 * dt; s.fuel -= 2.5 * dt; }
-  if (K.b && !rolling) s.speed -= 60 * dt;
-  if (s.fuel <= 0) s.speed -= 6 * dt;
+  const burn = dv => { const k = Math.min(dv, s.fuel / FUEL_PER_DV); s.fuel = Math.max(0, s.fuel - k * FUEL_PER_DV); return k; };
+  if (K.a && s.fuel > 0) s.speed += burn(Math.min(45 * dt, MAXSPD - s.speed));
+  if (K.b && !rolling && s.fuel > 0) s.speed -= burn(Math.min(60 * dt, s.speed));
   s.speed = clamp(s.speed, 0, MAXSPD);
-  s.fuel = Math.max(0, s.fuel - s.speed * 0.012 * dt);
+  // empty tank: no thrust either way, the ship coasts; a tug comes if you do not drift into a dock in time
+  if (s.fuel <= 0) {
+    if (G.noFuelT === 0) { say('NO FUEL! COASTING', 2); tone(220, 0.2); }
+    G.noFuelT += dt;
+  } else G.noFuelT = 0;
   if (s.fuel < 25 && !s.lowFuelWarned) { s.lowFuelWarned = true; say('LOW FUEL', 2); tone(988, 0.08); tone(988, 0.08, 'square', 0.04, 0.16); }
 
   // gravity well: pulls the ship sideways no matter where the nose points
@@ -1235,7 +1243,10 @@ function flight(dt) {
   }
 
   if (s.hull <= 0) { s.hull = 0; lose('SHIP LOST'); }
-  else if (s.fuel <= 0 && s.speed < 0.5) lose('OUT OF FUEL');
+  else if (s.fuel <= 0 && G.noFuelT > NO_FUEL_WAIT) {   // a tanker meets you where you are: no trip back to the start
+    G.state = 'tanker'; G.tankerT = 3; s.speed = 0; s.drift = [0, 0, 0];
+    tone(330, 0.1); tone(392, 0.1, 'square', 0.04, 0.12);
+  }
 }
 
 // ===================== screens =====================
@@ -1333,6 +1344,7 @@ function renderFlight() {
   else if (G.grav > 0.08) gauge('GRAV', G.grav);
 
   if (G.msgT > 0 && G.state === 'flight') msgBox(G.msg, 40);
+  else if (G.state === 'flight' && s.fuel <= 0) msgBox('NO FUEL  TANKER IN ' + Math.max(0, Math.ceil(NO_FUEL_WAIT - G.noFuelT)), 40);
   drawHUD();
 }
 
@@ -1349,6 +1361,9 @@ function drawHUD() {
   rect(0, VH + 1, W, 1, 2);
   txt('SPD', 2, 124, 0);  bar(20, 124, 32, s.speed / MAXSPD, false);
   txt('FUEL', 2, 131, 0); bar(20, 131, 32, s.fuel / 100, true);
+  // tick: fuel needed to brake to a stop from the current speed
+  const need = s.speed * FUEL_PER_DV;
+  if (need > 0.5) { const x = 21 + Math.min(29, Math.round(30 * need / 100)); rect(x, 130, 1, 7, s.fuel < need && G.blink ? 3 : 0); }
   txt('HULL', 2, 138, 0); bar(20, 138, 32, s.hull / 100, true);
 
   // radar: where the target is relative to the nose
@@ -1450,6 +1465,11 @@ function renderPause() {
     txt('< ' + v + ' >', 66, y, G.psel === i ? 0 : 1);
   });
   txtC('START: RESUME', 80, 74, 1);
+}
+function renderTanker() {
+  renderFlight();
+  msgBox('TANKER ALONGSIDE', 40);
+  if (G.blink) msgBox('REFUELING...', 54);
 }
 function renderLost() {
   renderFlight();
@@ -1618,6 +1638,14 @@ function update(dt) {
       }
       break;
     case 'lost': G.lostT -= dt; if (G.lostT <= 0) tow(); break;
+    case 'tanker':
+      G.tankerT -= dt;
+      if (G.tankerT <= 0) {
+        G.ship.fuel = TANKER_FUEL; G.credits = Math.max(0, G.credits - TANKER_FEE);
+        G.ship.lowFuelWarned = false; G.noFuelT = 0; G.state = 'flight';
+        say('REFUELED  -' + TANKER_FEE + 'CR', 2); tone(523, 0.08); tone(784, 0.1, 'square', 0.04, 0.08);
+      }
+      break;
     case 'warp':
       G.warpT += dt;
       if (G.warpT >= 3.2) { const n = STAGE.n + 1; G.sel = n; buildStage(n); dockAt(0, STAGES[n].intro); }
@@ -1634,6 +1662,7 @@ function render() {
     case 'flight': renderFlight(); break;
     case 'pause': renderPause(); break;
     case 'lost': renderLost(); break;
+    case 'tanker': renderTanker(); break;
     case 'warp': renderWarp(); break;
     case 'ending': renderEnding(); break;
   }
