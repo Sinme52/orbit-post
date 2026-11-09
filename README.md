@@ -52,10 +52,27 @@ Game Boy 風の 160×144・4階調画面で、コックピット視点の宇宙�
 | Shift | SELECT | 目標の切り替え。タイトルでは BGM のオン・オフ |
 | Enter | START | 一時停止（上下で項目、左右で色と BGM を変更） |
 
+## 公開用ファイルの作り方
+`index.html` は claude.ai の Artifact として公開できる形（`<html>` や `<head>` を省いた形）で書いています。
+`build.mjs` を実行すると、完全な HTML 文書に包んだ公開用ファイルが `dist/` にできます。
+
+```bash
+node orbit-post/build.mjs
+```
+
+- `dist/orbit-post.zip`：`index.html` と `README.txt` をルートに置いた zip。itch.io（HTML プロジェクト）にそのままアップロードできる
+- `dist/orbit-post/`：同じ中身のフォルダ。GitHub Pages や Netlify などに置くだけで動く
+
 ## テスト
 `test/playthrough.js` は、画面の目印だけを追いかける自動操縦で全ステージを通しでプレイします。
 キー入力と更新処理は本物を使い、時計だけを早回しします。ドック到着・船の喪失・ステージクリアを順に表示します。
 
 ```bash
 node orbit-post/test/playthrough.js
+```
+
+公開用に作ったファイルを試すときは、`ORBIT_PAGE` に URL を渡します（例：`dist/orbit-post` を http で配信したもの）。
+
+```bash
+ORBIT_PAGE=http://127.0.0.1:8765/ node orbit-post/test/playthrough.js
 ```

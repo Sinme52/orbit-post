@@ -5,7 +5,8 @@
 // every lost ship, a per-stage summary, and exits non-zero if the ending is not reached.
 const { chromium } = require('playwright');
 const START_UNLOCKED = +(process.argv[2] || 1);
-const PAGE = 'file://' + require('path').resolve(__dirname, '..', 'index.html');
+// ORBIT_PAGE overrides the page to test, e.g. a built copy served over http
+const PAGE = process.env.ORBIT_PAGE || 'file://' + require('path').resolve(__dirname, '..', 'index.html');
 
 (async () => {
   const browser = await chromium.launch();
