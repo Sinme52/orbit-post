@@ -5,7 +5,9 @@ Game Boy 風の 160×144・4階調画面で、コックピット視点の宇宙�
 4×4 のベイヤーディザで 4 階調に落としています。BGM は Web Audio で鳴らす 4 チャンネルの
 チップチューンです。外部ライブラリは使っていません。
 
-`index.html` をブラウザで開くだけで遊べます。インストールやサーバーは不要です。
+**ブラウザで遊ぶ：https://sinme52.github.io/orbit-post/**
+
+`index.html` をブラウザで開くだけでも遊べます。インストールやサーバーは不要です。
 
 ## ファイル
 | ファイル | 内容 |
@@ -70,6 +72,13 @@ node build.mjs        # または npm run build
 
 - `dist/orbit-post.zip`：`index.html` と `README.txt` をルートに置いた zip。itch.io（HTML プロジェクト）にそのままアップロードできる
 - `dist/orbit-post/`：同じ中身のフォルダ。GitHub Pages や Netlify などに置くだけで動く
+
+## GitHub Pages での公開
+`main` に push すると、`.github/workflows/pages.yml` が `build.mjs` で公開用ファイルを作り、
+GitHub Pages に公開します（`orbit-post.zip` もダウンロード用に同じ場所へ置きます）。
+
+最初の 1 回だけ、リポジトリの **Settings → Pages → Build and deployment → Source** を
+**GitHub Actions** にしてください。その後は Actions タブの「Deploy to GitHub Pages」から手動でも実行できます。
 
 ## テスト
 初回だけ `npm install` と `npx playwright install chromium` を実行してください。
