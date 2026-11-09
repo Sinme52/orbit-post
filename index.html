@@ -101,7 +101,7 @@ body{background:var(--night);color:var(--ink);font-family:var(--body);line-heigh
 .device button:focus-visible,.dpad:focus-visible{outline:3px solid var(--ab-hi);outline-offset:3px}
 
 /* ---------- notes ---------- */
-.notes{flex:1 1 300px;max-width:400px;min-width:0}
+.notes{flex:1 1 300px;max-width:420px;min-width:0}
 .notes h1{font:32px/1.2 var(--display);margin:4px 0 6px;letter-spacing:.04em;text-wrap:balance}
 .notes .lede{color:var(--muted);margin:0 0 24px}
 .notes h2{font:15px/1.4 var(--display);letter-spacing:.12em;color:var(--muted);margin:28px 0 10px;text-transform:uppercase}
@@ -114,6 +114,10 @@ kbd{
 }
 .notes ol{padding-left:1.3em;margin:0}
 .notes li{margin-bottom:6px}
+.stages{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.stages li{display:grid;grid-template-columns:4.2em 1fr;gap:4px 12px;border-top:1px solid var(--rule);padding-top:8px;margin:0}
+.stages b{font:15px/1.5 var(--display);letter-spacing:.06em;font-weight:400}
+.stages span{font-size:14px;color:var(--muted);min-width:0}
 .hud-words{font-family:var(--display);letter-spacing:.06em}
 .hint{font-size:13px;color:var(--muted);margin-top:22px;border-left:2px solid var(--rule);padding-left:12px}
 
@@ -157,7 +161,7 @@ kbd{
 
   <section class="notes">
     <h1>Orbit Post</h1>
-    <p class="lede">宇宙の配達便。コックピットから星系を飛び、荷物をステーションからステーションへ届けます。160×144・4階調、フラットシェーディングとディザだけで描いた3D試作です。</p>
+    <p class="lede">宇宙の配達便。コックピットから4つの星系を飛び、荷物をステーションからステーションへ届けます。160×144・4階調、フラットシェーディングとディザだけで描いた3Dと、4チャンネルのチップチューンBGMで動く試作です。</p>
 
     <h2>操作</h2>
     <table class="keys">
@@ -165,18 +169,27 @@ kbd{
       <tr><td><kbd>Z</kbd> A</td><td>加速（燃料を使う）</td></tr>
       <tr><td><kbd>X</kbd> B</td><td>減速</td></tr>
       <tr><td><kbd>X</kbd>＋<kbd>←</kbd><kbd>→</kbd></td><td>ロール（機体を傾ける）</td></tr>
-      <tr><td><kbd>Shift</kbd> SELECT</td><td>目標の切り替え</td></tr>
-      <tr><td><kbd>Enter</kbd> START</td><td>一時停止。停止中に左右で画面の色を変更</td></tr>
+      <tr><td><kbd>Shift</kbd> SELECT</td><td>目標の切り替え。タイトルではBGMのオン・オフ</td></tr>
+      <tr><td><kbd>Enter</kbd> START</td><td>一時停止。上下で項目、左右で画面の色とBGMを切り替え</td></tr>
+      <tr><td>タイトルで <kbd>←</kbd><kbd>→</kbd></td><td>行ったことのあるステージを選ぶ</td></tr>
     </table>
+
+    <h2>ステージ</h2>
+    <ul class="stages">
+      <li><b>1 AURA</b><span>小惑星帯を抜けて、月のそばの基地へ。</span></li>
+      <li><b>2 TALOS</b><span>環をもつ巨大ガス惑星。環の中を飛ぶと船体が削れるので、環のすき間を通る。</span></li>
+      <li><b>3 MIRE</b><span>霧の星雲。遠くが見えないので、レーダーと誘導灯が頼り。漂う岩と、霧に隠れた小惑星に注意。</span></li>
+      <li><b>4 HELIOS</b><span>恒星のすぐそば。近づきすぎると熱で船体が傷む。岩が恒星のまわりを回っている。</span></li>
+    </ul>
 
     <h2>遊び方</h2>
     <ol>
-      <li>ドックで荷物を受け取り、A で発進します。</li>
-      <li>画面の囲みか端の矢印、下のレーダーを頼りに目的地へ。間の小惑星帯にぶつかると船体が傷みます。</li>
+      <li>ドックで荷物を受け取り、A で発進します。各ステージで3件届けるとクリアし、ワープで次の星系へ進みます。</li>
+      <li>画面の囲みか端の矢印、下のレーダーを頼りに目的地へ向かいます。</li>
       <li>ドックの正面に点滅する誘導灯が並んでいます。速度 25 以下で、扉の中心へまっすぐ入るとドッキング成功です。</li>
       <li>画面上の表示 <span class="hud-words">SLOW DOWN / ALIGN / CENTER / DOCK OK</span> を見ながら寄せてください。</li>
     </ol>
-    <p class="hint">キーボードで遊ぶときは、先にゲーム画面を一度クリックしてください。スマホでは画面下のボタンで操作できます。</p>
+    <p class="hint">キーボードで遊ぶときは、先にゲーム画面を一度クリックしてください。BGMは最初にキーかボタンを押したときに鳴り始めます。スマホでは画面下のボタンで操作できます。</p>
   </section>
 </main>
 
@@ -277,6 +290,14 @@ function torus(m, R, r, S, T, al) {
   for (let i = 0; i < S; i++) for (let j = 0; j < T; j++)
     quad(m, P(i,j), P(i+1,j), P(i+1,j+1), P(i,j+1), typeof al === 'function' ? al(i, j) : al);
 }
+// flat ring in the local x-z plane: bands = [[r0, r1, albedo], ...]
+function annulus(m, bands, segs) {
+  for (const [r0, r1, al] of bands) for (let i = 0; i < segs; i++) {
+    const a0 = i / segs * Math.PI * 2, a1 = (i + 1) / segs * Math.PI * 2;
+    const c0 = Math.cos(a0), s0 = Math.sin(a0), c1 = Math.cos(a1), s1 = Math.sin(a1);
+    quad(m, [c0*r0, 0, s0*r0], [c1*r0, 0, s1*r0], [c1*r1, 0, s1*r1], [c0*r1, 0, s0*r1], al - (i % 3 === 0 ? 0.1 : 0));
+  }
+}
 function ico(sub, radiusFn, albFn) {
   const t = (1 + Math.sqrt(5)) / 2;
   const V = [[-1,t,0],[1,t,0],[-1,-t,0],[1,-t,0],[0,-1,t],[0,1,t],[0,-1,-t],[0,1,-t],[t,0,-1],[t,0,1],[-t,0,-1],[-t,0,1]].map(norm);
@@ -297,6 +318,7 @@ function ico(sub, radiusFn, albFn) {
   }
   return m;
 }
+function sphereMesh(sub, albFn) { const m = ico(sub, () => 1, albFn); m.convex = true; return m; }
 // a thin lit frame around a dock door so it reads even on the night side
 function doorFrame(m, r, z) {
   const o = r + 2, zz = z + 0.15, E = 2.62;
@@ -307,6 +329,51 @@ function doorFrame(m, r, z) {
 }
 function rotZ(p, a) { const c = Math.cos(a), s = Math.sin(a); return [p[0]*c - p[1]*s, p[0]*s + p[1]*c, p[2]]; }
 
+// ----- shared meshes -----
+const MESH = {};
+// ring station: hub along local z, dock door on +z
+MESH.station = Mesh();
+prism(MESH.station, 6, 22, -30, 30, 0.8, 0.85);
+prism(MESH.station, 6, 22.5, -5, 5, 2.6, 0.8);
+quad(MESH.station, [-9,-9,30.6], [9,-9,30.6], [9,9,30.6], [-9,9,30.6], 0.06);
+doorFrame(MESH.station, 9, 30.5);
+torus(MESH.station, 70, 7, 16, 4, (i, j) => (i % 4 === 0 && j === 0) ? 2.7 : 0.72);
+for (let k = 0; k < 3; k++) { const a = k * Math.PI * 2 / 3; box(MESH.station, 20, -3, -3, 64, 3, 3, 0.6, p => rotZ(p, a)); }
+box(MESH.station, -4, -4, -56, 4, 4, -30, 0.55);
+box(MESH.station, -34, -1, -52, 34, 1, -44, 0.35);
+// outpost: box module with solar wings, door on +z
+MESH.outpost = Mesh();
+box(MESH.outpost, -18, -14, -18, 18, 14, 18, [0.7, 0.85, 0.7, 0.7, 0.6, 0.8]);
+quad(MESH.outpost, [-8,-8,18.6], [8,-8,18.6], [8,8,18.6], [-8,8,18.6], 0.06);
+doorFrame(MESH.outpost, 8, 18.5);
+box(MESH.outpost, -24, -2, -2, -18, 2, 2, 0.6);
+box(MESH.outpost, 18, -2, -2, 24, 2, 2, 0.6);
+box(MESH.outpost, -70, -1, -9, -24, 1, 9, 0.32);
+box(MESH.outpost, 24, -1, -9, 70, 1, 9, 0.32);
+box(MESH.outpost, -1.5, 14, -1.5, 1.5, 30, 1.5, 0.6);
+box(MESH.outpost, -2.5, 30, -2.5, 2.5, 34, 2.5, 2.9);
+// parcel shown on the dock screen
+MESH.crate = Mesh();
+box(MESH.crate, -10, -10, -10, 10, 10, 10, [0.85, 0.85, 0.8, 0.8, 0.7, 0.95]);
+box(MESH.crate, -10.6, -10.6, -2.5, 10.6, 10.6, 2.5, 0.45);
+box(MESH.crate, -2.5, -10.6, -10.6, 2.5, 10.6, 10.6, 0.45);
+// rocks
+MESH.rocks = [];
+for (let v = 0; v < 5; v++) {
+  const seed = 100 + v * 17;
+  MESH.rocks.push(ico(1, p => 1 + (fbm(mul(p, 1.7), seed) - 0.5) * 0.8, c => 0.5 + 0.3 * fbm(mul(c, 2.5), seed + 5)));
+}
+// planets and stars
+MESH.aura = sphereMesh(2, c => Math.abs(c[1]) > 0.86 ? 1.0 : fbm(mul(c, 2.3), 11) > 0.52 ? 0.95 : 0.5);
+MESH.moon = sphereMesh(1, c => 0.55 + 0.35 * fbm(mul(c, 3.1), 40));
+MESH.giant = sphereMesh(2, c => { const b = Math.sin(c[1] * 9 + fbm(mul(c, 3), 70) * 2.5); return b > 0.35 ? 0.95 : b > -0.3 ? 0.7 : 0.45; });
+MESH.ice = sphereMesh(1, c => 0.8 + 0.2 * fbm(mul(c, 3), 90));
+MESH.dark = sphereMesh(2, c => 0.3 + 0.3 * fbm(mul(c, 2.7), 120));
+MESH.sun = sphereMesh(2, c => 2.72 + 0.28 * fbm(mul(c, 4), 150));
+MESH.umbra = sphereMesh(2, c => { const n = fbm(mul(c, 2.2), 170); return n > 0.55 ? 0.85 : n > 0.42 ? 0.6 : 0.4; });
+MESH.ring = Mesh();
+annulus(MESH.ring, [[950, 1080, 0.8], [1080, 1200, 0.6], [1280, 1440, 0.9], [1440, 1600, 0.65]], 48);
+
 // ===================== world objects =====================
 function makeObj(mesh, pos, az, opts = {}) {
   const b = basisFrom(az || [0, 0, 1], opts.up);
@@ -316,99 +383,128 @@ function makeObj(mesh, pos, az, opts = {}) {
   return o;
 }
 function orthoObj(o) { o.az = norm(o.az); o.ax = norm(cross(o.ay, o.az)); o.ay = cross(o.az, o.ax); }
-
-const LIGHT = norm([0.9, 0.4, 0.1]);
-const AMB = 0.1, DIF = 0.9;
-
-// planet
-const planetMesh = ico(2, () => 1, c => {
-  if (Math.abs(c[1]) > 0.86) return 1.0;
-  return fbm(mul(c, 2.3), 11) > 0.52 ? 0.95 : 0.5;
-});
-planetMesh.convex = true;
-const planet = makeObj(planetMesh, [-300, -500, 2400], [0, 0, 1], { s: 1100 });
-planet.cr = 1100 * 0.97; planet.big = true; planet.spinAxis = norm([0.2, 1, 0]); planet.spinW = 0.012;
-
-// moon
-const moonMesh = ico(1, () => 1, c => 0.55 + 0.35 * fbm(mul(c, 3.1), 40));
-moonMesh.convex = true;
-const moon = makeObj(moonMesh, [700, 150, -1800], [0, 0, 1], { s: 220 });
-moon.cr = 220 * 0.95; moon.big = true; moon.spinAxis = [0, 1, 0]; moon.spinW = 0.02;
-
-// station "AURA DOCK": hub along local z, dock door on +z
-const stationMesh = Mesh();
-prism(stationMesh, 6, 22, -30, 30, 0.8, 0.85);
-prism(stationMesh, 6, 22.5, -5, 5, 2.6, 0.8);            // lit window band
-quad(stationMesh, [-9,-9,30.6], [9,-9,30.6], [9,9,30.6], [-9,9,30.6], 0.06); // door
-doorFrame(stationMesh, 9, 30.5);
-torus(stationMesh, 70, 7, 16, 4, (i, j) => (i % 4 === 0 && j === 0) ? 2.7 : 0.72);
-for (let k = 0; k < 3; k++) { const a = k * Math.PI * 2 / 3; box(stationMesh, 20, -3, -3, 64, 3, 3, 0.6, p => rotZ(p, a)); }
-box(stationMesh, -4, -4, -56, 4, 4, -30, 0.55);
-box(stationMesh, -34, -1, -52, 34, 1, -44, 0.35);
-const station = makeObj(stationMesh, [0, 0, 600], [0, 0, -1]);
-station.spinW = 0.3;
-
-// outpost "LUNA POST": box module with solar wings, door on +z
-const outpostMesh = Mesh();
-box(outpostMesh, -18, -14, -18, 18, 14, 18, [0.7, 0.85, 0.7, 0.7, 0.6, 0.8]);
-quad(outpostMesh, [-8,-8,18.6], [8,-8,18.6], [8,8,18.6], [-8,8,18.6], 0.06);
-doorFrame(outpostMesh, 8, 18.5);
-box(outpostMesh, -24, -2, -2, -18, 2, 2, 0.6);
-box(outpostMesh, 18, -2, -2, 24, 2, 2, 0.6);
-box(outpostMesh, -70, -1, -9, -24, 1, 9, 0.32);
-box(outpostMesh, 24, -1, -9, 70, 1, 9, 0.32);
-box(outpostMesh, -1.5, 14, -1.5, 1.5, 30, 1.5, 0.6);
-box(outpostMesh, -2.5, 30, -2.5, 2.5, 34, 2.5, 2.9);
-const outpostPos = [560, 120, -1450];
-const outpost = makeObj(outpostMesh, outpostPos, sub(station.pos, outpostPos));
-outpost.spinW = 0;
-
-const PORTS = [
-  { name: 'AURA DOCK', obj: station, hub: [-20,-20,-30, 20,20,30], door: 9,
+function sphereBody(mesh, pos, r, spinW = 0.02) {
+  const o = makeObj(mesh, pos, [0, 0, 1], { s: r });
+  o.cr = r * 0.97; o.big = true; o.spinAxis = norm([0.15, 1, 0]); o.spinW = spinW;
+  return o;
+}
+function stationPort(name, pos, face, spin = 0.3) {
+  const o = makeObj(MESH.station, pos, face);
+  o.spinLocal = spin;
+  return { name, obj: o, hub: [-20,-20,-30, 20,20,30], door: 9,
     boxes: [[-4,-4,-56, 4,4,-30], [-34,-1,-52, 34,1,-44]], torus: { R: 70, r: 7 },
-    lights: [[-11,-11,31],[11,-11,31],[11,11,31],[-11,11,31]] },
-  { name: 'LUNA POST', obj: outpost, hub: [-18,-14,-18, 18,14,18], door: 8,
+    lights: [[-11,-11,31],[11,-11,31],[11,11,31],[-11,11,31]] };
+}
+function outpostPort(name, pos, face) {
+  const o = makeObj(MESH.outpost, pos, face);
+  return { name, obj: o, hub: [-18,-14,-18, 18,14,18], door: 8,
     boxes: [[-70,-1,-9, -24,1,9], [24,-1,-9, 70,1,9], [-2.5,14,-2.5, 2.5,34,2.5]], torus: null,
-    lights: [[-10,-10,19],[10,-10,19],[10,10,19],[-10,10,19]] },
-];
-
-// asteroid belt between the two docks
-const asteroids = [];
-{
-  const R = rng(7);
-  const variants = [];
-  for (let v = 0; v < 5; v++) {
-    const seed = 100 + v * 17;
-    const m = ico(1, p => 1 + (fbm(mul(p, 1.7), seed) - 0.5) * 0.8, c => 0.5 + 0.3 * fbm(mul(c, 2.5), seed + 5));
-    variants.push(m);
-  }
-  const A = add(station.pos, [0, 0, -30]), B = add(outpost.pos, mul(outpost.az, 18));
-  const axis = norm(sub(B, A)), side = basisFrom(axis);
+    lights: [[-10,-10,19],[10,-10,19],[10,10,19],[-10,10,19]] };
+}
+function rockField(R, n, place, avoid, smin = 7, smax = 34, gap = 20) {
+  const out = [];
   let tries = 0;
-  while (asteroids.length < 30 && tries++ < 500) {
-    const t = 0.18 + R() * 0.64;
-    const ang = R() * Math.PI * 2, rad = Math.sqrt(R()) * 280;
-    const p = add(add(A, mul(sub(B, A), t)), add(mul(side.r, Math.cos(ang) * rad), mul(side.u, Math.sin(ang) * rad)));
-    if (len(sub(p, station.pos)) < 180 || len(sub(p, outpost.pos)) < 160) continue;
-    const s = 7 + Math.pow(R(), 2) * 28;
-    if (asteroids.some(o => len(sub(o.pos, p)) < o.s + s + 20)) continue;
-    const o = makeObj(variants[(R() * 5) | 0], p, [R() - 0.5, R() - 0.5, R() - 0.5], { s });
+  while (out.length < n && tries++ < n * 40) {
+    const p = place();
+    if (avoid.some(([q, d]) => len(sub(p, q)) < d)) continue;
+    const s = smin + Math.pow(R(), 2) * (smax - smin);
+    if (out.some(o => len(sub(o.pos, p)) < o.s + s + gap)) continue;
+    const o = makeObj(MESH.rocks[(R() * MESH.rocks.length) | 0], p, [R() - 0.5, R() - 0.5, R() - 0.5 + 1e-3], { s });
     o.cr = s * 0.9;
-    o.spinAxis = norm([R() - 0.5, R() - 0.5, R() - 0.5]);
+    o.spinAxis = norm([R() - 0.5, R() - 0.5, R() - 0.5 + 1e-3]);
     o.spinW = 0.15 + R() * 0.6;
-    asteroids.push(o);
+    out.push(o);
   }
+  return out;
 }
 
-// parcel shown on the dock screen
-const crateMesh = Mesh();
-box(crateMesh, -10, -10, -10, 10, 10, 10, [0.85, 0.85, 0.8, 0.8, 0.7, 0.95]);
-box(crateMesh, -10.6, -10.6, -2.5, 10.6, 10.6, 2.5, 0.45);
-box(crateMesh, -2.5, -10.6, -10.6, 2.5, 10.6, 10.6, 0.45);
-const crate = makeObj(crateMesh, [0, 0, 0], [0, 0, 1]);
-
-const SCENE = [planet, moon, station, outpost, ...asteroids];
-const BODIES = [planet, moon, ...asteroids];
+// ===================== stages =====================
+function buildAura() {
+  const planet = sphereBody(MESH.aura, [-300, -500, 2400], 1100, 0.012);
+  const moon = sphereBody(MESH.moon, [700, 150, -1800], 220, 0.02);
+  const a = stationPort('AURA DOCK', [0, 0, 600], [0, 0, -1], 0.3);
+  const op = [560, 120, -1450];
+  const b = outpostPort('LUNA POST', op, sub(a.obj.pos, op));
+  const R = rng(7);
+  const A = add(a.obj.pos, [0, 0, -30]), B = add(b.obj.pos, mul(b.obj.az, 18));
+  const side = basisFrom(sub(B, A));
+  const rocks = rockField(R, 30, () => {
+    const t = 0.18 + R() * 0.64, ang = R() * Math.PI * 2, rad = Math.sqrt(R()) * 280;
+    return add(add(A, mul(sub(B, A), t)), add(mul(side.r, Math.cos(ang) * rad), mul(side.u, Math.sin(ang) * rad)));
+  }, [[a.obj.pos, 180], [b.obj.pos, 160]]);
+  return { ports: [a, b], objects: [planet, moon, ...rocks], bodies: [planet, moon, ...rocks],
+    light: norm([0.9, 0.4, 0.1]), amb: 0.1 };
+}
+function buildTalos() {
+  const GC = [0, -900, 0];
+  const giant = sphereBody(MESH.giant, GC, 700, 0.03);
+  giant.spinAxis = [0, 1, 0];
+  const ring = makeObj(MESH.ring, GC, [0, 0, 1]);
+  const ice = sphereBody(MESH.ice, [2402, -900, 1120], 150, 0.05);
+  const st = stationPort('TALOS DOCK', [1240, -640, 0], [0, -1, 0], 0.35);
+  const kp = [620, -1200, 1074];
+  const keel = outpostPort('KEEL POST', kp, sub([1240, -1200, 0], kp));
+  const ip = [2161, -860, 787];
+  const yard = outpostPort('ICE YARD', ip, sub(st.obj.pos, ip));
+  const R = rng(21);
+  const gapRocks = rockField(R, 14, () => {
+    const ang = -0.25 + R() * 1.5, rad = 1215 + R() * 50;
+    return [GC[0] + Math.cos(ang) * rad, GC[1] + (R() - 0.5) * 50, GC[2] + Math.sin(ang) * rad];
+  }, [[st.obj.pos, 150], [keel.obj.pos, 150], [[1240, -900, 0], 60]], 4, 12, 30);
+  const outerRocks = rockField(R, 12, () => {
+    const ang = R() * 1.4, rad = 1700 + R() * 500;
+    return [Math.cos(ang) * rad, GC[1] + (R() - 0.5) * 300, Math.sin(ang) * rad];
+  }, [[st.obj.pos, 180], [yard.obj.pos, 180], [ice.pos, 220]]);
+  return { ports: [st, keel, yard], objects: [giant, ring, ice, ...gapRocks, ...outerRocks],
+    bodies: [giant, ice, ...gapRocks, ...outerRocks],
+    light: norm([0.5, 0.6, 0.6]), amb: 0.1,
+    ring: { obj: ring, bands: [[950, 1200], [1280, 1600]], half: 14 } };
+}
+function buildMire() {
+  const gate = stationPort('MIRE GATE', [0, 0, 0], [0, 0, 1], 0.25);
+  const lp = [900, 200, 1300], wp = [-1100, -300, 1100];
+  const lamp = outpostPort('FOG LAMP', lp, sub([0, 0, 0], lp));
+  const well = outpostPort('DEEP WELL', wp, sub([0, 0, 0], wp));
+  const rock = sphereBody(MESH.dark, [-150, 80, 1500], 300, 0.01);
+  const R = rng(33);
+  const C = [-100, 0, 800], HS = [1500, 650, 1100];
+  const drift = rockField(R, 44, () => [C[0] + (R() * 2 - 1) * HS[0], C[1] + (R() * 2 - 1) * HS[1], C[2] + (R() * 2 - 1) * HS[2]],
+    [[gate.obj.pos, 230], [lamp.obj.pos, 200], [well.obj.pos, 200], [rock.pos, 380]]);
+  for (const o of drift) { o.vel = mul(norm([R() - 0.5, (R() - 0.5) * 0.4, R() - 0.5]), 3 + R() * 7); o.wrap = { c: C, hs: HS }; }
+  const neb = [];
+  for (let i = 0; i < 70; i++) neb.push({ d: norm([R() * 2 - 1, (R() * 2 - 1) * 0.6, R() * 2 - 1]), r: 0.12 + R() * 0.3, I: 0.12 + R() * 0.18 });
+  return { ports: [gate, lamp, well], objects: [rock, ...drift], bodies: [rock, ...drift],
+    light: norm([0.3, 0.8, -0.5]), amb: 0.16, fog: { start: 110, end: 560, I: 0.07 }, nebula: neb };
+}
+function buildHelios() {
+  const SUN = [0, 0, 0];
+  const sun = sphereBody(MESH.sun, SUN, 500, 0.05);
+  sun.noLight = true;
+  const umbra = sphereBody(MESH.umbra, [-2600, 0, 400], 400, 0.02);
+  const ring = stationPort('HELIOS RING', [1250, 60, 0], [1, 0, 0], 0.6);
+  const fp = [300, 0, 900], sp = [-3150, 0, 480];
+  const flare = outpostPort('FLARE LAB', fp, fp);
+  const shade = outpostPort('SHADE POST', sp, sub(sp, umbra.pos));
+  const R = rng(55);
+  const orbiters = [];
+  while (orbiters.length < 26) {
+    const r = 720 + R() * 1500;
+    if ((r > 1150 && r < 1350) || (r > 880 && r < 1030)) continue;
+    const o = rockField(R, 1, () => [r, 0, 0], [], 8, 26)[0];
+    o.orbit = { r, ph: R() * Math.PI * 2, w: (32 + R() * 40) / r, y: (R() - 0.5) * 140 };
+    orbiters.push(o);
+  }
+  return { ports: [ring, flare, shade], objects: [sun, umbra, ...orbiters], bodies: [sun, umbra, ...orbiters],
+    point: SUN, amb: 0.06, sunObj: sun, heat: { c: SUN, r0: 1150, r1: 600 } };
+}
+const STAGES = [
+  { name: 'AURA',   music: 'aura',   build: buildAura,   intro: ['WELCOME, PILOT.', 'FIRST JOB IS READY.'] },
+  { name: 'TALOS',  music: 'talos',  build: buildTalos,  intro: ['STAGE 2  TALOS', 'RING DEBRIS HURTS.'] },
+  { name: 'MIRE',   music: 'mire',   build: buildMire,   intro: ['STAGE 3  MIRE', 'FOG AHEAD. USE RADAR.'] },
+  { name: 'HELIOS', music: 'helios', build: buildHelios, intro: ['STAGE 4  HELIOS', 'KEEP AWAY FROM SUN.'] },
+];
+const QUOTA = 3;
+let STAGE = null;
 
 // stars (directions at infinity)
 const STARS = [];
@@ -430,6 +526,7 @@ function makeVP(x0, y0, x1, y1, fov) {
 const VP_FLIGHT = makeVP(0, 0, W, VH, 70 * Math.PI / 180);
 const VP_TITLE = makeVP(0, 0, W, H, 70 * Math.PI / 180);
 const VP_CRATE = makeVP(103, 27, 157, 93, 40 * Math.PI / 180);
+const VP_END = makeVP(48, 40, 112, 96, 40 * Math.PI / 180);
 
 function clearVP(vp, c) {
   for (let y = vp.y0; y < vp.y1; y++) { const row = y * W; for (let x = vp.x0; x < vp.x1; x++) { fb[row + x] = c; zb[row + x] = 0; } }
@@ -485,13 +582,17 @@ function rasterTri(cv, a, b, c, I, vp) {
   for (let i = 1; i < n - 1; i++) fillTri(PX[0], PY[0], PW[0], PX[i], PY[i], PW[i], PX[i+1], PY[i+1], PW[i+1], I, vp);
 }
 
-function renderObjects(cam, list, vp, light) {
+// opts: { amb, fog: {start, end, I}, point: light position (else `light` is a direction) }
+function renderObjects(cam, list, vp, light, opts = {}) {
+  const amb = opts.amb ?? 0.1, dif = 1 - amb, fog = opts.fog, point = opts.point;
   for (const o of list) {
     const d = sub(o.pos, cam.pos);
     const cz = dot(d, cam.f), cx = dot(d, cam.r), cy = dot(d, cam.u);
     if (cz + o.radius < NEAR) continue;
+    if (fog && cz - o.radius > fog.end * 1.8) continue;
     const zz = Math.max(cz + o.radius, NEAR);
     if (Math.abs(cx) - o.radius > zz * vp.tx || Math.abs(cy) - o.radius > zz * vp.ty) continue;
+    const L = point ? norm(sub(point, o.pos)) : light;
     const m = o.mesh, nv = m.v.length;
     if (!m.wv) { m.wv = new Float64Array(nv * 3); m.cv = new Float64Array(nv * 3); }
     const wv = m.wv, cv = m.cv, s = o.s;
@@ -524,7 +625,12 @@ function renderObjects(cam, list, vp, light) {
       } else if (facing < 0) { nx = -nx; ny = -ny; nz = -nz; }
       let I;
       if (al >= 2) I = al - 2;
-      else I = al * (AMB + DIF * Math.max(0, nx*light[0] + ny*light[1] + nz*light[2]));
+      else I = al * (amb + dif * Math.max(0, nx*L[0] + ny*L[1] + nz*L[2]));
+      if (fog) {
+        const zc = (cv[a+2] + cv[b+2] + cv[c+2]) / 3, end = al >= 2 ? fog.end * 1.8 : fog.end;
+        const f = clamp(1 - (zc - fog.start) / (end - fog.start), 0, 1);
+        I = I * f + fog.I * (1 - f);
+      }
       rasterTri(cv, a, b, c, I, vp);
     }
   }
@@ -538,27 +644,31 @@ function camProject(cam, vp, p) {
   return { x: vp.cx + dot(d, cam.r) * vp.F * w, y: vp.cy - dot(d, cam.u) * vp.F * w, w, z };
 }
 function inVP(vp, x, y) { return x >= vp.x0 && x < vp.x1 && y >= vp.y0 && y < vp.y1; }
+function dirProject(cam, vp, d) {
+  const z = dot(d, cam.f); if (z <= 0.05) return null;
+  return { x: vp.cx + dot(d, cam.r) * vp.F / z, y: vp.cy - dot(d, cam.u) * vp.F / z, z };
+}
 
-function renderStars(cam, vp) {
+function renderStars(cam, vp, dim) {
   for (const [d, b] of STARS) {
-    const z = dot(d, cam.f); if (z <= 0.05) continue;
-    const x = Math.floor(vp.cx + dot(d, cam.r) * vp.F / z), y = Math.floor(vp.cy - dot(d, cam.u) * vp.F / z);
+    if (dim && b < 3) continue;
+    const q = dirProject(cam, vp, d); if (!q) continue;
+    const x = Math.floor(q.x), y = Math.floor(q.y);
     if (!inVP(vp, x, y)) continue;
-    const i = y * W + x;
-    if (zb[i] === 0 && fb[i] < b) fb[i] = b;
+    const i = y * W + x, c = dim ? 2 : b;
+    if (zb[i] === 0 && fb[i] < c) fb[i] = c;
   }
 }
-function renderSun(cam, vp) {
-  const z = dot(LIGHT, cam.f); if (z <= 0.05) return;
-  const sx = vp.cx + dot(LIGHT, cam.r) * vp.F / z, sy = vp.cy - dot(LIGHT, cam.u) * vp.F / z;
-  const R0 = 4.5, R1 = 11;
-  for (let y = Math.floor(sy - R1); y <= sy + R1; y++) for (let x = Math.floor(sx - R1); x <= sx + R1; x++) {
-    if (!inVP(vp, x, y)) continue;
+// soft glow disc on the background: used for the distant sun, nebula puffs and the corona
+function glow(vp, sx, sy, r0, r1, Imax) {
+  const x0 = Math.max(vp.x0, Math.floor(sx - r1)), x1 = Math.min(vp.x1 - 1, Math.ceil(sx + r1));
+  const y0 = Math.max(vp.y0, Math.floor(sy - r1)), y1 = Math.min(vp.y1 - 1, Math.ceil(sy + r1));
+  for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
     const dd = Math.hypot(x + 0.5 - sx, y + 0.5 - sy);
-    if (dd > R1) continue;
-    const I = dd <= R0 ? 1 : 0.5 * (1 - (dd - R0) / (R1 - R0));
+    if (dd > r1) continue;
+    const I = dd <= r0 ? Imax : Imax * (1 - (dd - r0) / (r1 - r0));
     const c = dith(I, x, y), i = y * W + x;
-    if (fb[i] < c) fb[i] = c;
+    if (zb[i] === 0 && fb[i] < c) fb[i] = c;
   }
 }
 function wpoint(cam, vp, p, c, size) {
@@ -569,6 +679,26 @@ function wpoint(cam, vp, p, c, size) {
     const i = y * W + x;
     if (q.w >= zb[i] * 0.995) fb[i] = c;
   }
+}
+
+function renderSpace(cam, vp) {
+  clearVP(vp, 0);
+  const S = STAGE;
+  if (S.nebula) for (const p of S.nebula) {
+    const q = dirProject(cam, vp, p.d); if (!q) continue;
+    const rp = p.r * vp.F / q.z;
+    glow(vp, q.x, q.y, 0, rp, p.I);
+  }
+  renderStars(cam, vp, !!S.nebula);
+  if (S.light && !S.nebula) {
+    const q = dirProject(cam, vp, S.light);
+    if (q) { glow(vp, q.x, q.y, 4.5, 11, 0.5); glow(vp, q.x, q.y, 4.5, 4.6, 1); }
+  }
+  if (S.sunObj) {
+    const q = camProject(cam, vp, S.sunObj.pos);
+    if (q) { const rp = S.sunObj.s * vp.F * q.w; glow(vp, q.x, q.y, rp * 0.95, rp * 1.3 + 6, 0.55); }
+  }
+  renderObjects(cam, S.scene, vp, S.light, { amb: S.amb, fog: S.fog, point: S.point });
 }
 
 // ===================== 2D drawing =====================
@@ -597,9 +727,9 @@ function txt(s, x, y, c, sc = 1) {
 }
 const txtW = (s, sc = 1) => s.length * 4 * sc - sc;
 const txtC = (s, cx, y, c, sc = 1) => txt(s, Math.round(cx - txtW(s, sc) / 2), y, c, sc);
-function line(x0, y0, x1, y1, c) {
-  const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0), 1);
-  for (let i = 0; i <= n; i++) pset(Math.round(x0 + (x1 - x0) * i / n), Math.round(y0 + (y1 - y0) * i / n), c);
+function txtO(s, cx, y, c, sc = 1) {   // centered text with a dark outline, readable over 3D scenes
+  for (const [dx, dy] of [[-1,0],[1,0],[0,-1],[0,1]]) txtC(s, cx + dx, y + dy, 0, sc);
+  txtC(s, cx, y, c, sc);
 }
 function circle(cx, cy, r, c) {
   for (let a = 0; a < 64; a++) { const t = a / 64 * Math.PI * 2; pset(Math.round(cx + Math.cos(t) * r), Math.round(cy + Math.sin(t) * r), c); }
@@ -610,9 +740,172 @@ function msgBox(s, cy) {
 }
 const pad = (n, k) => String(Math.max(0, Math.floor(n))).padStart(k, '0');
 
+// ===================== music =====================
+// Four channels like the handheld: pulse lead, pulse arpeggio, triangle bass, noise drums.
+// lead: "NOTE:steps" tokens (16 steps per bar, "r" rests, "|" marks bars); chords: one per bar;
+// bass/drums: 16-step patterns (R root, O octave, 5 fifth / k kick, s snare, h hat).
+const TRACKS = {
+  title: { bpm: 120, chords: 'C Am F G C Am F G',
+    lead: 'E5:4 G5:2 C6:4 B5:2 G5:4 | A5:6 G5:2 E5:4 C5:4 | F5:4 A5:2 C6:4 A5:2 F5:4 | G5:8 r:4 D5:2 G5:2 | E5:2 F5:2 G5:4 E5:4 C5:4 | C6:4 B5:4 A5:4 E5:4 | F5:2 G5:2 A5:4 C6:4 D6:4 | B5:4 A5:4 G5:8',
+    bass: 'R...R.O.R...R.5.', arp: [0, 1, 2, 1], arpOct: 4, drums: 'k...s...k.k.s...' },
+  dock: { bpm: 96, chords: 'F Dm Bb C',
+    lead: 'A5:4 C6:4 A5:4 F5:4 | F5:6 E5:2 D5:8 | D5:4 F5:4 A#5:4 A5:4 | G5:12 r:4',
+    bass: 'R...5...R...5...', arp: [0, 1, 2, 1], arpOct: 4, drums: 'k.......h.......' },
+  aura: { bpm: 140, chords: 'Am F G Am Am F G E',
+    lead: 'A4:2 C5:2 E5:4 A5:4 G5:2 E5:2 | F5:4 E5:2 C5:2 A4:8 | G4:2 B4:2 D5:4 G5:4 F5:2 D5:2 | E5:6 D5:2 C5:4 B4:4 | A5:4 G5:2 A5:2 E5:4 C5:4 | F5:2 G5:2 A5:4 C6:4 A5:4 | B5:4 G5:4 D5:4 B4:4 | G#5:4 B5:4 E5:8',
+    bass: 'R.R.O.R.R.R.O.R.', arp: [0, 1, 2], arpOct: 5, arpVol: 0.012, drums: 'k.h.s.h.kkh.s.hh' },
+  talos: { bpm: 104, chords: 'Dm C Bb C Dm F G A',
+    lead: 'D5:4 F5:4 A5:6 G5:2 | E5:4 G5:4 C6:8 | D6:4 C6:2 A#5:2 F5:8 | G5:8 E5:4 C5:4 | A5:4 F5:2 A5:2 D6:8 | C6:4 A5:4 F5:8 | D6:4 B5:4 G5:8 | C#6:4 E6:4 A5:8',
+    bass: 'R...R...O...R...', arp: [0, 1, 2, 1], arpOct: 4, drums: 'k...h...s...h.h.' },
+  mire: { bpm: 92, chords: 'Em C Am B Em C Am B',
+    lead: 'B4:8 E5:4 G5:4 | F#5:8 E5:4 B4:4 | C5:6 D5:2 E5:8 | D#5:8 r:8 | G5:4 F#5:4 E5:4 B4:4 | C5:8 G5:8 | A5:6 G5:2 E5:4 C5:4 | B4:16',
+    bass: 'R.......R.....O.', arp: [0, 2, 1, 2], arpOct: 4, arpVol: 0.022, drums: 'k.......k...h...' },
+  helios: { bpm: 156, chords: 'Cm Ab Bb G Cm Ab Fm G',
+    lead: 'C5:2 D#5:2 G5:2 C6:4 A#5:2 G5:4 | G#5:4 G5:2 D#5:2 C5:8 | A#4:2 D5:2 F5:2 A#5:4 G#5:2 F5:4 | G5:4 B4:4 D5:4 F5:4 | G5:2 G5:2 C6:4 D#6:4 D6:2 C6:2 | C6:4 G#5:4 D#5:4 C5:4 | F5:4 G#5:4 C6:4 G#5:4 | B5:8 D6:8',
+    bass: 'R.O.R.O.R.O.R.O.', arp: [0, 1, 2, 1], arpOct: 5, arpVol: 0.012, drums: 'k.hsk.hsk.hsk.ss' },
+  clear: { bpm: 150, loop: false, chords: 'C C',
+    lead: 'C5:2 E5:2 G5:2 C6:6 G5:2 C6:2 | E6:12 r:4',
+    bass: 'R...R...O.......', arp: null, drums: 'k.k.k...s.......' },
+};
+const SEMI = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+function noteMidi(n) {
+  const m = /^([A-G])(#|b)?(\d)$/.exec(n);
+  return 12 * (+m[3] + 1) + SEMI[m[1]] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0);
+}
+function chordOf(name) {
+  const m = /^([A-G])(#|b)?(m?)$/.exec(name);
+  return { root: (SEMI[m[1]] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0) + 12) % 12, tones: [0, m[3] ? 3 : 4, 7] };
+}
+function compileTrack(name, t) {
+  const chords = t.chords.split(/\s+/).map(chordOf), steps = chords.length * 16;
+  const lead = new Array(steps).fill(null);
+  let pos = 0, barStart = 0;
+  for (const tok of t.lead.split(/\s+/)) {
+    if (tok === '|') { if (pos - barStart !== 16) console.warn('music: bar length', name, pos - barStart); barStart = pos; continue; }
+    const [n, d] = tok.split(':'), k = +d;
+    if (n !== 'r') lead[pos] = { midi: noteMidi(n), steps: k };
+    pos += k;
+  }
+  if (pos !== steps) console.warn('music: track length', name, pos, steps);
+  return Object.assign({ loop: true }, t, { name, chords, steps, lead });
+}
+const COMPILED = {};
+for (const k in TRACKS) COMPILED[k] = compileTrack(k, TRACKS[k]);
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+
+let AC = null, musicBus = null, sfxBus = null, noiseBuf = null;
+const WAVES = {};
+const Music = { name: undefined, cur: null, step: 0, next: 0, gain: -1 };
+function pulseWave(duty) {
+  const n = 32, re = new Float32Array(n), im = new Float32Array(n);
+  for (let k = 1; k < n; k++) re[k] = 2 / (k * Math.PI) * Math.sin(Math.PI * k * duty);
+  return AC.createPeriodicWave(re, im);
+}
+function audioInit() {
+  try {
+    if (!AC) {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+      musicBus = AC.createGain(); musicBus.gain.value = 0; musicBus.connect(AC.destination);
+      sfxBus = AC.createGain(); sfxBus.gain.value = 1; sfxBus.connect(AC.destination);
+      WAVES.lead = pulseWave(0.25); WAVES.arp = pulseWave(0.125);
+      noiseBuf = AC.createBuffer(1, AC.sampleRate, AC.sampleRate);
+      const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      Music.gain = -1; Music.next = 0;
+    } else if (AC.state === 'suspended' && !document.hidden) AC.resume();
+  } catch (e) { AC = null; }
+}
+document.addEventListener('visibilitychange', () => {
+  if (!AC) return;
+  try { if (document.hidden) AC.suspend(); else AC.resume(); } catch (e) {}
+});
+function voice(wave, f, t, dur, vol) {
+  const o = AC.createOscillator(), g = AC.createGain();
+  if (typeof wave === 'string') o.type = wave; else o.setPeriodicWave(wave);
+  o.frequency.value = f;
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(vol, t + 0.006);
+  g.gain.setValueAtTime(vol, t + dur * 0.6);
+  g.gain.linearRampToValueAtTime(0, t + dur);
+  o.connect(g); g.connect(musicBus); o.start(t); o.stop(t + dur + 0.02);
+}
+function noiseHit(t, type, freq, dur, vol) {
+  const s = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain();
+  s.buffer = noiseBuf; f.type = type; f.frequency.value = freq;
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0005, t + dur);
+  s.connect(f); f.connect(g); g.connect(musicBus); s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.02);
+}
+function kick(t) {
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = 'sine'; o.frequency.setValueAtTime(160, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.12);
+  g.gain.setValueAtTime(0.22, t); g.gain.exponentialRampToValueAtTime(0.0005, t + 0.15);
+  o.connect(g); g.connect(musicBus); o.start(t); o.stop(t + 0.17);
+}
+function scheduleStep(tr, step, t, sd) {
+  const ev = tr.lead[step];
+  if (ev) voice(WAVES.lead, mtof(ev.midi), t, ev.steps * sd * 0.92, 0.05);
+  const ch = tr.chords[(step / 16) | 0], s16 = step % 16;
+  if (tr.arp) {
+    const idx = tr.arp[step % tr.arp.length];
+    voice(WAVES.arp, mtof(12 * (tr.arpOct + 1) + ch.root + ch.tones[idx]), t, sd * 0.7, tr.arpVol || 0.018);
+  }
+  const b = tr.bass[s16];
+  if (b !== '.') {
+    let n = 1; while (s16 + n < 16 && tr.bass[s16 + n] === '.') n++;
+    let m = 36 + ch.root; if (m < 40) m += 12;
+    if (b === 'O') m += 12; else if (b === '5') m += 7;
+    voice('triangle', mtof(m), t, n * sd * 0.85, 0.12);
+  }
+  const d = tr.drums[s16];
+  if (d === 'k') kick(t);
+  else if (d === 's') noiseHit(t, 'bandpass', 1800, 0.12, 0.13);
+  else if (d === 'h') noiseHit(t, 'highpass', 7000, 0.04, 0.05);
+}
+function playTrack(name) {
+  if (Music.name === name) return;
+  Music.name = name; Music.cur = name ? COMPILED[name] : null; Music.step = 0;
+  Music.next = AC ? AC.currentTime + 0.08 : 0;
+}
+function musicTick() {
+  if (!AC || AC.state !== 'running') return;
+  const want = !G.musicOn ? 0 : G.state === 'pause' ? 0.25 : 0.7;
+  if (want !== Music.gain) { Music.gain = want; musicBus.gain.setTargetAtTime(want, AC.currentTime, 0.06); }
+  const tr = Music.cur;
+  if (!tr) return;
+  const sd = 60 / tr.bpm / 4;
+  if (Music.next < AC.currentTime - 0.05) Music.next = AC.currentTime + 0.05;   // fell behind (tab was hidden): skip ahead
+  while (Music.next < AC.currentTime + 0.12) {
+    scheduleStep(tr, Music.step, Music.next, sd);
+    Music.next += sd;
+    if (++Music.step >= tr.steps) {
+      if (tr.loop) Music.step = 0; else { Music.cur = null; break; }
+    }
+  }
+}
+setInterval(musicTick, 25);
+
+// sound effects
+function tone(f, d, type = 'square', v = 0.04, when = 0) {
+  if (!AC) return;
+  try {
+    const t0 = AC.currentTime + when, o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.value = f;
+    g.gain.setValueAtTime(v, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+    o.connect(g); g.connect(sfxBus); o.start(t0); o.stop(t0 + d + 0.02);
+  } catch (e) {}
+}
+function sweep(f0, f1, d, v = 0.04) {
+  if (!AC) return;
+  try {
+    const t0 = AC.currentTime, o = AC.createOscillator(), g = AC.createGain();
+    o.type = 'square'; o.frequency.setValueAtTime(f0, t0); o.frequency.exponentialRampToValueAtTime(f1, t0 + d);
+    g.gain.setValueAtTime(v, t0); g.gain.setValueAtTime(v, t0 + d * 0.7); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+    o.connect(g); g.connect(sfxBus); o.start(t0); o.stop(t0 + d + 0.02);
+  } catch (e) {}
+}
+
 // ===================== game state =====================
 const MAXSPD = 100, DOCK_SPEED = 25;
-const CARGO = ['MEDICINE', 'ICE CORES', 'SEED BANK', 'MAIL BAGS', 'SPARE PARTS', 'TEA LEAVES', 'ROBOT PETS', 'STAR MAPS'];
+const CARGO = ['MEDICINE', 'ICE CORES', 'SEED BANK', 'MAIL BAGS', 'SPARE PARTS', 'TEA LEAVES', 'ROBOT PETS', 'STAR MAPS', 'TELESCOPE', 'BIRTHDAY CAKE'];
 const PALS = [
   { name: 'GREEN',  c: [[15,56,15],[48,98,48],[139,172,15],[155,188,15]] },
   { name: 'SILVER', c: [[24,24,26],[86,88,92],[166,168,170],[226,226,222]] },
@@ -622,24 +915,40 @@ const PALS = [
 const jobRng = rng(42);
 
 const G = {
-  state: 'title', t: 0, blink: 0, pal: 0,
+  state: 'title', t: 0, blink: 0, pal: 0, musicOn: true, psel: 0,
   ship: { pos: [0,0,0], r: [1,0,0], u: [0,1,0], f: [0,0,1], speed: 0, fuel: 100, hull: 100, pv: 0, yv: 0, rv: 0, lowFuelWarned: false },
   credits: 0, delivered: 0, job: null, port: 0, lastPort: 0, target: 1,
-  msg: '', msgT: 0, shake: 0, lostMsg: '', lostT: 0, dockEvent: [], crateA: 0,
+  stage: 0, sel: 0, unlocked: 1, stageDone: 0, cleared: false, heat: 0,
+  msg: '', msgT: 0, shake: 0, lostMsg: '', lostT: 0, dockEvent: [], crateA: 0, warpT: 0,
   dust: [],
 };
-try { const p = parseInt(localStorage.getItem('orbitpost.pal'), 10); if (p >= 0 && p < PALS.length) G.pal = p; } catch (e) {}
-function setPal(p) { G.pal = p % PALS.length; try { localStorage.setItem('orbitpost.pal', String(G.pal)); } catch (e) {} }
+function load(key, fallback) { try { const v = localStorage.getItem('orbitpost.' + key); return v === null ? fallback : JSON.parse(v); } catch (e) { return fallback; } }
+function save(key, v) { try { localStorage.setItem('orbitpost.' + key, JSON.stringify(v)); } catch (e) {} }
+G.pal = clamp(load('pal', 0) | 0, 0, PALS.length - 1);
+G.musicOn = load('music', true) !== false;
+G.unlocked = clamp(load('unlocked', 1) | 0, 1, STAGES.length);
+G.sel = G.unlocked - 1;
+function setPal(p) { G.pal = (p + PALS.length) % PALS.length; save('pal', G.pal); }
+function toggleMusic() { G.musicOn = !G.musicOn; save('music', G.musicOn); }
 
+function buildStage(n) {
+  const def = STAGES[n], b = def.build();
+  STAGE = Object.assign({ n, quota: QUOTA }, def, b);
+  STAGE.scene = [...b.objects, ...b.ports.map(p => p.obj)];
+  G.stage = n; G.stageDone = 0; G.cleared = false; G.heat = 0;
+  G.job = newJob(0);
+}
 function newJob(from) {
-  return { cargo: CARGO[(jobRng() * CARGO.length) | 0], to: 1 - from, pay: 100 + 10 * ((jobRng() * 9) | 0) };
+  const others = STAGE.ports.map((_, i) => i).filter(i => i !== from);
+  return { cargo: CARGO[(jobRng() * CARGO.length) | 0], to: others[(jobRng() * others.length) | 0], pay: 100 + 10 * STAGE.n * 3 + 10 * ((jobRng() * 9) | 0) };
 }
 function say(s, t = 1.6) { G.msg = s; G.msgT = t; }
 
 function startGame() {
   G.credits = 0; G.delivered = 0;
-  G.job = { cargo: 'MEDICINE', to: 1, pay: 120 };
-  dockAt(0, ['WELCOME, PILOT.', 'FIRST JOB IS READY.']);
+  buildStage(G.sel);
+  if (G.sel === 0) G.job = { cargo: 'MEDICINE', to: 1, pay: 120 };
+  dockAt(0, STAGES[G.sel].intro);
   tone(523, 0.08); tone(784, 0.12, 'square', 0.04, 0.08);
 }
 function dockAt(idx, events) {
@@ -651,22 +960,28 @@ function dockAt(idx, events) {
 function dock(idx) {
   if (G.job && G.job.to === idx) {
     const pay = G.job.pay;
-    G.credits += pay; G.delivered++;
-    G.job = newJob(idx);
-    dockAt(idx, ['DELIVERED!', '+' + pay + 'CR']);
-    [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.1, 'square', 0.04, i * 0.09));
+    G.credits += pay; G.delivered++; G.stageDone++;
+    if (G.stageDone >= STAGE.quota) {
+      G.cleared = true; G.job = null;
+      G.unlocked = Math.max(G.unlocked, Math.min(STAGES.length, STAGE.n + 2)); save('unlocked', G.unlocked);
+      dockAt(idx, ['DELIVERED! +' + pay + 'CR', 'STAGE CLEAR!']);
+    } else {
+      G.job = newJob(idx);
+      dockAt(idx, ['DELIVERED!', '+' + pay + 'CR']);
+      [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.1, 'square', 0.035, i * 0.09));
+    }
   } else {
     dockAt(idx, ['DOCKED.', 'NO CARGO FOR HERE.']);
     tone(659, 0.08); tone(523, 0.1, 'square', 0.04, 0.08);
   }
 }
 function launch() {
-  const P = PORTS[G.port], o = P.obj, s = G.ship;
+  const P = STAGE.ports[G.port], o = P.obj, s = G.ship;
   const b = basisFrom(o.az);
   s.pos = add(o.pos, mul(o.az, P.hub[5] + 45));
   s.r = b.r; s.u = b.u; s.f = b.f;
   s.speed = 12; s.pv = s.yv = s.rv = 0;
-  G.target = G.job ? G.job.to : 1 - G.port;
+  G.target = G.job ? G.job.to : (G.port + 1) % STAGE.ports.length;
   G.state = 'flight';
   initDust();
   say('LAUNCH!', 1.2);
@@ -680,22 +995,30 @@ function tow() {
   G.credits = Math.max(0, G.credits - 50);
   dockAt(G.lastPort, ['TOWED BACK.', '-50CR TOW FEE']);
 }
-
 function initDust() {
   const R = rng((G.t * 1000) | 0);
   G.dust = [];
   for (let i = 0; i < 70; i++) G.dust.push(add(G.ship.pos, [R() * 120 - 60, R() * 120 - 60, R() * 120 - 60]));
 }
 
+function spinAll(o, k, w) { o.ax = rot(o.ax, k, w); o.ay = rot(o.ay, k, w); o.az = rot(o.az, k, w); }
 function worldTick(dt) {
-  planet.ax = rot(planet.ax, planet.spinAxis, planet.spinW * dt); planet.ay = rot(planet.ay, planet.spinAxis, planet.spinW * dt); planet.az = rot(planet.az, planet.spinAxis, planet.spinW * dt);
-  moon.ax = rot(moon.ax, moon.spinAxis, moon.spinW * dt); moon.ay = rot(moon.ay, moon.spinAxis, moon.spinW * dt); moon.az = rot(moon.az, moon.spinAxis, moon.spinW * dt);
-  station.ax = rot(station.ax, station.az, station.spinW * dt); station.ay = rot(station.ay, station.az, station.spinW * dt);
-  for (const a of asteroids) {
-    const w = a.spinW * dt;
-    a.ax = rot(a.ax, a.spinAxis, w); a.ay = rot(a.ay, a.spinAxis, w); a.az = rot(a.az, a.spinAxis, w);
+  if (!STAGE) return;
+  const reortho = ((G.t * 10) | 0) % 20 === 0;
+  for (const o of STAGE.scene) {
+    if (o.spinLocal) { const w = o.spinLocal * dt; o.ax = rot(o.ax, o.az, w); o.ay = rot(o.ay, o.az, w); }
+    else if (o.spinAxis) spinAll(o, o.spinAxis, o.spinW * dt);
+    if (o.vel) {
+      o.pos = add(o.pos, mul(o.vel, dt));
+      const { c, hs } = o.wrap;
+      for (let j = 0; j < 3; j++) { const d = o.pos[j] - c[j]; if (d > hs[j]) o.pos[j] -= 2 * hs[j]; else if (d < -hs[j]) o.pos[j] += 2 * hs[j]; }
+    }
+    if (o.orbit) {
+      const q = o.orbit; q.ph += q.w * dt;
+      o.pos = [Math.cos(q.ph) * q.r, q.y, Math.sin(q.ph) * q.r];
+    }
+    if (reortho && (o.spinLocal || o.spinAxis)) orthoObj(o);
   }
-  if (((G.t * 10) | 0) % 20 === 0) { orthoObj(station); orthoObj(planet); orthoObj(moon); asteroids.forEach(orthoObj); }
 }
 
 function toLocal(o, p) { const d = sub(p, o.pos); return [dot(d, o.ax) / o.s, dot(d, o.ay) / o.s, dot(d, o.az) / o.s]; }
@@ -707,9 +1030,9 @@ function hit(dmg, msg) {
 function doorPoint(P) { return add(P.obj.pos, mul(P.obj.az, P.hub[5] + 1)); }
 
 function flight(dt) {
-  const s = G.ship;
-  if (pressed('start')) { G.state = 'pause'; tone(440, 0.06); return; }
-  if (pressed('select')) { G.target = 1 - G.target; tone(880, 0.05); }
+  const s = G.ship, S = STAGE;
+  if (pressed('start')) { G.state = 'pause'; G.psel = 0; tone(440, 0.06); return; }
+  if (pressed('select')) { G.target = (G.target + 1) % S.ports.length; tone(880, 0.05); }
 
   const lr = (K.right ? 1 : 0) - (K.left ? 1 : 0), ud = (K.up ? 1 : 0) - (K.down ? 1 : 0);
   const rolling = K.b && lr !== 0;
@@ -735,8 +1058,8 @@ function flight(dt) {
   const prev = s.pos;
   s.pos = add(s.pos, mul(s.f, s.speed * dt));
 
-  // spheres: planet, moon, asteroids
-  for (const b of BODIES) {
+  // spheres: planets, sun, rocks
+  for (const b of S.bodies) {
     const d = sub(s.pos, b.pos), dl = len(d);
     if (dl < b.cr + 3) {
       s.pos = add(b.pos, mul(d, (b.cr + 3.5) / (dl || 1)));
@@ -744,9 +1067,27 @@ function flight(dt) {
       else { hit(6 + s.speed * 0.3, 'COLLISION'); s.speed *= 0.25; }
     }
   }
+  // planetary ring: flying inside a ring band grinds the hull
+  if (S.ring) {
+    const lp = toLocal(S.ring.obj, s.pos), rad = Math.hypot(lp[0], lp[2]);
+    if (Math.abs(lp[1]) < S.ring.half && S.ring.bands.some(([r0, r1]) => rad >= r0 && rad < r1)) {
+      s.hull -= 45 * dt; s.speed *= Math.max(0, 1 - 2 * dt); G.shake = 0.15;
+      if (G.msgT < 0.3) { say('RING DEBRIS!', 0.6); tone(90 + Math.random() * 60, 0.08, 'sawtooth', 0.04); }
+    }
+  }
+  // star heat
+  G.heat = 0;
+  if (S.heat) {
+    const d = len(sub(s.pos, S.heat.c));
+    G.heat = clamp((S.heat.r0 - d) / (S.heat.r0 - S.heat.r1), 0, 1);
+    if (G.heat > 0) {
+      s.hull -= 10 * G.heat * dt;
+      if (G.msgT <= 0) { say('HEAT WARNING', 1.2); tone(1320, 0.05); tone(1320, 0.05, 'square', 0.04, 0.12); }
+    }
+  }
   // docks
-  for (let i = 0; i < PORTS.length; i++) {
-    const P = PORTS[i], o = P.obj;
+  for (let i = 0; i < S.ports.length; i++) {
+    const P = S.ports[i], o = P.obj;
     if (len(sub(s.pos, o.pos)) > o.radius + 10) continue;
     const lp = toLocal(o, s.pos), pp = toLocal(o, prev);
     let crash = false;
@@ -781,17 +1122,9 @@ function flight(dt) {
 // ===================== screens =====================
 function shipCam() { const s = G.ship; return { pos: s.pos, r: s.r, u: s.u, f: s.f }; }
 
-function renderSpace(cam, vp) {
-  clearVP(vp, 0);
-  renderStars(cam, vp);
-  renderSun(cam, vp);
-  renderObjects(cam, SCENE, vp, LIGHT);
-}
-
 function renderFlight() {
-  const s = G.ship;
-  const shake = G.shake > 0 ? 1 : 0;
-  const vp = shake ? Object.assign({}, VP_FLIGHT, { cx: VP_FLIGHT.cx + (Math.random() * 3 - 1.5), cy: VP_FLIGHT.cy + (Math.random() * 3 - 1.5) }) : VP_FLIGHT;
+  const s = G.ship, S = STAGE;
+  const vp = G.shake > 0 ? Object.assign({}, VP_FLIGHT, { cx: VP_FLIGHT.cx + (Math.random() * 3 - 1.5), cy: VP_FLIGHT.cy + (Math.random() * 3 - 1.5) }) : VP_FLIGHT;
   const cam = shipCam();
   renderSpace(cam, vp);
 
@@ -811,7 +1144,7 @@ function renderFlight() {
 
   // dock beacons and approach lights
   const tick = (G.t * 6) | 0;
-  for (const P of PORTS) {
+  for (const P of S.ports) {
     const o = P.obj, dist = len(sub(o.pos, s.pos));
     if (dist > 900) continue;
     const toW = l => add(o.pos, add(add(mul(o.ax, l[0]), mul(o.ay, l[1])), mul(o.az, l[2])));
@@ -827,7 +1160,7 @@ function renderFlight() {
   for (const [dx, dy] of [[-3,0],[-2,0],[2,0],[3,0],[0,-3],[0,-2],[0,2],[0,3]]) pset(80 + dx, 60 + dy, 2);
 
   // nav target
-  const T = PORTS[G.target], tdist = len(sub(T.obj.pos, s.pos));
+  const T = S.ports[G.target], tdist = len(sub(T.obj.pos, s.pos));
   const tp = tdist < 400 ? doorPoint(T) : T.obj.pos;
   const tv = sub(tp, s.pos), lx = dot(tv, s.r), ly = dot(tv, s.u), lz = dot(tv, s.f);
   const q = lz > NEAR ? { x: vp.cx + lx * vp.F / lz, y: vp.cy - ly * vp.F / lz } : null;
@@ -846,13 +1179,12 @@ function renderFlight() {
     const px = 80 + dx * t, py = 60 + dy * t;
     if (G.blink || lz > 0) {
       const tipx = px + dx * 4, tipy = py + dy * 4, bx = px - dx * 2, by = py - dy * 2;
-      const big = 1e9, I = 1, vpA = { x0: 0, y0: 0, x1: W, y1: VH };
-      fillTri(tipx, tipy, big, bx - dy * 3.5, by + dx * 3.5, big, bx + dy * 3.5, by - dx * 3.5, big, I, vpA);
+      fillTri(tipx, tipy, 1e9, bx - dy * 3.5, by + dx * 3.5, 1e9, bx + dy * 3.5, by - dx * 3.5, 1e9, 1, { x0: 0, y0: 0, x1: W, y1: VH });
     }
   }
 
   // docking guide
-  for (const P of PORTS) {
+  for (const P of S.ports) {
     const o = P.obj;
     if (len(sub(o.pos, s.pos)) > 340) continue;
     const lp = toLocal(o, s.pos);
@@ -866,6 +1198,11 @@ function renderFlight() {
     if (word === 'DOCK OK' && !G.blink) { frame(x, 2, w, 9, 3); txt(word, x + 3, 4, 3); }
     else { rect(x, 2, w, 9, 3); txt(word, x + 3, 4, 0); }
     break;
+  }
+  // heat gauge
+  if (G.heat > 0) {
+    rect(2, 2, 34, 9, 3); frame(2, 2, 34, 9, 0); txt('HEAT', 4, 4, 0);
+    rect(21, 4, Math.max(1, Math.round(13 * G.heat)), 5, G.blink && G.heat > 0.5 ? 0 : 1);
   }
 
   if (G.msgT > 0 && G.state === 'flight') msgBox(G.msg, 40);
@@ -891,78 +1228,141 @@ function drawHUD() {
   const cx = 65, cy = 133;
   circle(cx, cy, 9, 1);
   pset(cx, cy, 2);
-  const T = PORTS[G.target];
+  const T = STAGE.ports[G.target];
   const v = norm(sub(T.obj.pos, s.pos));
   const vx = dot(v, s.r), vy = dot(v, s.u), vz = dot(v, s.f);
   const px = Math.round(cx + vx * 8), py = Math.round(cy - vy * 8);
   if (vz >= 0) rect(px - 1, py - 1, 2, 2, 0);
-  else if (G.blink) { frame(px - 1, py - 1, 3, 3, 0); }
+  else if (G.blink) frame(px - 1, py - 1, 3, 3, 0);
 
   const isJob = G.job && G.job.to === G.target;
   txt((isJob ? '>' : ' ') + T.name, 78, 124, 0);
   txt('DIST ' + pad(Math.min(9999, len(sub(T.obj.pos, s.pos))), 4), 82, 131, 1);
   txt('CR ' + pad(G.credits, 4), 82, 138, 0);
-  if (G.job) rect(116, 138, 5, 5, 1), rect(117, 139, 3, 3, 2), pset(118, 138, 0), pset(118, 142, 0);
+  txt(G.stageDone + '/' + STAGE.quota, 156 - txtW('0/0'), 138, 1);
 }
 
+function titleCam() {
+  const c = STAGE.ports[0].obj.pos, a = G.t * 0.12;
+  const pos = add(c, [Math.sin(a) * 240, 40 + Math.sin(a * 0.7) * 25, Math.cos(a) * 240]);
+  const b = basisFrom(sub(add(c, [0, 38, 0]), pos));
+  return { pos, r: b.r, u: b.u, f: b.f };
+}
 function renderTitle() {
-  const a = G.t * 0.12;
-  const pos = add(station.pos, [Math.sin(a) * 240, 40 + Math.sin(a * 0.7) * 25, Math.cos(a) * 240]);
-  const b = basisFrom(sub(add(station.pos, [0, 38, 0]), pos));
-  renderSpace({ pos, r: b.r, u: b.u, f: b.f }, VP_TITLE);
+  renderSpace(titleCam(), VP_TITLE);
   for (const [dx, dy] of [[-1,0],[1,0],[0,-1],[0,1],[1,1],[2,2]]) txtC('ORBIT POST', 80 + dx, 16 + dy, 0, 2);
   txtC('ORBIT POST', 80, 16, 3, 2);
-  for (const [dx, dy] of [[-1,0],[1,0],[0,-1],[0,1]]) txtC('SPACE COURIER', 80 + dx, 32 + dy, 0);
-  txtC('SPACE COURIER', 80, 32, 2);
-  if (G.blink) { for (const [dx, dy] of [[-1,0],[1,0],[0,-1],[0,1]]) txtC('PRESS START', 80 + dx, 124 + dy, 0); txtC('PRESS START', 80, 124, 3); }
-  txtC('PROTOTYPE', 80, 136, 1);
+  txtO('SPACE COURIER', 80, 32, 2);
+  const st = 'STAGE ' + (G.sel + 1) + '  ' + STAGES[G.sel].name;
+  txtO(st, 80, 108, 3);
+  if (G.unlocked > 1) {
+    const w = txtW(st) / 2 + 8;
+    if (G.sel > 0) txtO('<', 80 - w, 108, G.blink ? 3 : 2);
+    if (G.sel < G.unlocked - 1) txtO('>', 80 + w, 108, G.blink ? 3 : 2);
+  }
+  if (G.blink) txtO('PRESS START', 80, 122, 3);
+  txtO('SELECT: MUSIC ' + (G.musicOn ? 'ON' : 'OFF'), 80, 136, 2);
 }
+
+function spinCrate(o, ang) {
+  const az = rot(rot([0, 0, 1], [0, 1, 0], ang), [1, 0, 0], 0.45), ay = rot(rot([0, 1, 0], [0, 1, 0], ang), [1, 0, 0], 0.45);
+  o.az = az; o.ay = ay; o.ax = cross(ay, az);
+}
+const crate = makeObj(MESH.crate, [0, 0, 0], [0, 0, 1]);
+const CRATE_CAM = { pos: [0, 0, -62], r: [1, 0, 0], u: [0, 1, 0], f: [0, 0, 1] };
+const CRATE_LIGHT = norm([0.5, 0.7, -0.6]);
 
 function renderDocked() {
   rect(0, 0, W, H, 3);
-  const P = PORTS[G.port];
+  const P = STAGE.ports[G.port];
   rect(0, 0, W, 11, 0);
   txt(P.name, 4, 3, 3);
-  txt('DOCK', 156 - txtW('DOCK'), 3, 2);
+  txt('ST' + (STAGE.n + 1), 156 - txtW('ST1'), 3, 2);
   let y = 16;
   for (const l of G.dockEvent) { txt(l, 4, y, 0); y += 7; }
   txt('FUEL 100%', 4, 33, 1);
   txt('HULL 100%', 4, 40, 1);
   for (let x = 4; x < 98; x += 2) pset(x, 50, 1);
-  if (G.job) {
+  if (G.cleared) {
+    const last = STAGE.n === STAGES.length - 1;
+    txt('ROUTE CLEAR', 4, 55, 1);
+    txt(last ? 'ALL SYSTEMS DONE' : 'NEXT SYSTEM:', 4, 63, 0);
+    if (!last) txt(STAGES[STAGE.n + 1].name, 4, 71, 0);
+  } else if (G.job) {
     txt('NEXT JOB', 4, 55, 1);
     txt(G.job.cargo, 4, 63, 0);
-    txt('TO ' + PORTS[G.job.to].name, 4, 71, 0);
+    txt('TO ' + STAGE.ports[G.job.to].name, 4, 71, 0);
     txt('PAY ' + G.job.pay + 'CR', 4, 79, 0);
   }
-  // cargo window with the parcel
   frame(102, 26, 56, 68, 0);
   clearVP(VP_CRATE, 0);
   for (let i = 0; i < 18; i++) { const x = 104 + ((i * 37) % 52), yy = 28 + ((i * 23) % 64); fb[yy * W + x] = 1; }
-  const ang = G.crateA;
-  const az = rot(rot([0, 0, 1], [0, 1, 0], ang), [1, 0, 0], 0.45), ay = rot(rot([0, 1, 0], [0, 1, 0], ang), [1, 0, 0], 0.45);
-  crate.az = az; crate.ay = ay; crate.ax = cross(ay, az);
-  renderObjects({ pos: [0, 0, -62], r: [1, 0, 0], u: [0, 1, 0], f: [0, 0, 1] }, [crate], VP_CRATE, norm([0.5, 0.7, -0.6]));
+  if (!G.cleared) {
+    spinCrate(crate, G.crateA);
+    renderObjects(CRATE_CAM, [crate], VP_CRATE, CRATE_LIGHT);
+  } else txtC(G.blink ? 'CLEAR' : '', 130, 57, 3);
   txtC('CARGO', 130, 97, 1);
 
   rect(0, 108, W, 1, 0);
   txt('CR ' + pad(G.credits, 4), 4, 113, 0);
-  txt('DONE ' + pad(G.delivered, 2), 156 - txtW('DONE 00'), 113, 0);
-  if (G.blink) { rect(46, 126, 68, 11, 0); txtC('A: LAUNCH', 80, 129, 3); }
-  else txtC('A: LAUNCH', 80, 129, 0);
+  txt('JOBS ' + G.stageDone + '/' + STAGE.quota, 156 - txtW('JOBS 0/0'), 113, 0);
+  const label = G.cleared ? (STAGE.n === STAGES.length - 1 ? 'A: FINISH' : 'A: WARP') : 'A: LAUNCH';
+  if (G.blink) { rect(46, 126, 68, 11, 0); txtC(label, 80, 129, 3); }
+  else txtC(label, 80, 129, 0);
 }
 
 function renderPause() {
   renderFlight();
-  rect(30, 40, 100, 40, 3); frame(29, 39, 102, 42, 0); frame(31, 41, 98, 38, 1);
-  txtC('PAUSE', 80, 46, 0);
-  txtC('< ' + PALS[G.pal].name + ' >', 80, 58, 0);
-  txtC('START: RESUME', 80, 70, 1);
+  rect(24, 34, 112, 50, 3); frame(23, 33, 114, 52, 0); frame(25, 35, 110, 48, 1);
+  txtC('PAUSE', 80, 40, 0);
+  const rows = [['COLOR', PALS[G.pal].name], ['MUSIC', G.musicOn ? 'ON' : 'OFF']];
+  rows.forEach(([k, v], i) => {
+    const y = 52 + i * 9;
+    if (G.psel === i) txt('>', 30, y, 0);
+    txt(k, 36, y, 0);
+    txt('< ' + v + ' >', 66, y, G.psel === i ? 0 : 1);
+  });
+  txtC('START: RESUME', 80, 74, 1);
 }
 function renderLost() {
   renderFlight();
   msgBox(G.lostMsg, 40);
   if (G.blink) msgBox('CALLING TUG...', 54);
+}
+function renderWarp() {
+  clearVP(VP_TITLE, 0);
+  const t = G.warpT;
+  for (let k = 0; k < 10; k++) {
+    const p = ((k / 10) + t * 0.9) % 1, r = 3 + p * p * 120, I = Math.min(1, p * 1.3) * Math.min(1, t);
+    const n = Math.max(24, Math.round(r * 5));
+    for (let i = 0; i < n; i++) {
+      const a = i / n * Math.PI * 2, x = Math.round(80 + Math.cos(a) * r), y = Math.round(72 + Math.sin(a) * r * 0.9);
+      if (x >= 0 && x < W && y >= 0 && y < H) { const c = dith(I, x, y); if (fb[y * W + x] < c) fb[y * W + x] = c; }
+    }
+  }
+  for (let i = 0; i < 48; i++) {
+    const a = i * 2.39996, p = ((i * 0.37) + t * 1.8) % 1, r0 = p * p * 110, r1 = r0 * 1.3 + 2;
+    for (let r = r0; r < r1; r += 0.7) pset(Math.round(80 + Math.cos(a) * r), Math.round(72 + Math.sin(a) * r), p > 0.5 ? 3 : 2);
+  }
+  if (t < 1.4) { rect(54, 60, 52, 18, 0); txtO('WARP', 80, 64, 3, 2); }
+  else {
+    const next = STAGE.n + 1;
+    rect(36, 52, 88, 34, 0); frame(36, 52, 88, 34, 2);
+    txtO('STAGE ' + (next + 1), 80, 58, 3, 2);
+    txtO(STAGES[next].name, 80, 76, 2);
+  }
+}
+function renderEnding() {
+  rect(0, 0, W, H, 0);
+  for (let i = 0; i < 60; i++) pset((i * 53) % 160, (i * 97) % 144, (i % 5 === 0) ? 2 : 1);
+  txtO('ALL ROUTES CLEAR', 80, 14, 3);
+  txtO('THANK YOU, PILOT.', 80, 26, 2);
+  clearVP(VP_END, 0);
+  spinCrate(crate, G.t);
+  renderObjects(CRATE_CAM, [crate], VP_END, CRATE_LIGHT);
+  txtO('CREDITS  ' + pad(G.credits, 4), 80, 104, 3);
+  txtO('DELIVERIES  ' + pad(G.delivered, 2), 80, 113, 3);
+  if (G.blink) txtO('PRESS START', 80, 130, 3);
 }
 
 // ===================== input =====================
@@ -1013,24 +1413,6 @@ dpad.addEventListener('pointercancel', dpadOff);
 dpad.addEventListener('lostpointercapture', dpadOff);
 dpad.addEventListener('contextmenu', e => e.preventDefault());
 
-// ===================== sound =====================
-let AC = null;
-function audioInit() {
-  try {
-    if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
-    else if (AC.state === 'suspended') AC.resume();
-  } catch (e) { AC = null; }
-}
-function tone(f, d, type = 'square', v = 0.04, when = 0) {
-  if (!AC) return;
-  try {
-    const t0 = AC.currentTime + when, o = AC.createOscillator(), g = AC.createGain();
-    o.type = type; o.frequency.value = f;
-    g.gain.setValueAtTime(v, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
-    o.connect(g); g.connect(AC.destination); o.start(t0); o.stop(t0 + d + 0.02);
-  } catch (e) {}
-}
-
 // ===================== main loop =====================
 const canvas = document.getElementById('lcd');
 const ctx = canvas.getContext('2d');
@@ -1040,6 +1422,14 @@ function blit() {
   for (let i = 0, j = 0; i < W * H; i++, j += 4) { const c = p[fb[i]]; d[j] = c[0]; d[j+1] = c[1]; d[j+2] = c[2]; d[j+3] = 255; }
   ctx.putImageData(img, 0, 0);
 }
+function wantedTrack() {
+  switch (G.state) {
+    case 'title': case 'ending': return 'title';
+    case 'docked': return G.cleared ? 'clear' : 'dock';
+    case 'warp': return null;
+    default: return STAGE.music;
+  }
+}
 function update(dt) {
   for (const k of KEYS) { K[k] = KB[k] || TB[k] || TAP[k]; TAP[k] = false; }
   G.t += dt; G.blink = ((G.t * 3) | 0) & 1;
@@ -1047,16 +1437,39 @@ function update(dt) {
   if (G.msgT > 0) G.msgT -= dt;
   if (G.shake > 0) G.shake -= dt;
   switch (G.state) {
-    case 'title': if (pressed('start') || pressed('a')) startGame(); break;
-    case 'docked': G.crateA += dt * 0.9; if (pressed('a') || pressed('start')) launch(); break;
+    case 'title':
+      if (pressed('left') && G.sel > 0) { G.sel--; buildStage(G.sel); tone(660, 0.04); }
+      if (pressed('right') && G.sel < G.unlocked - 1) { G.sel++; buildStage(G.sel); tone(660, 0.04); }
+      if (pressed('select')) { toggleMusic(); tone(880, 0.05); }
+      if (pressed('start') || pressed('a')) startGame();
+      break;
+    case 'docked':
+      G.crateA += dt * 0.9;
+      if (pressed('a') || pressed('start')) {
+        if (!G.cleared) launch();
+        else if (STAGE.n < STAGES.length - 1) { G.state = 'warp'; G.warpT = 0; sweep(110, 1760, 2.6, 0.035); }
+        else { G.state = 'ending'; }
+      }
+      break;
     case 'flight': flight(dt); break;
     case 'pause':
       if (pressed('start')) { G.state = 'flight'; tone(440, 0.06); }
-      if (pressed('left')) { setPal(G.pal + PALS.length - 1); tone(660, 0.04); }
-      if (pressed('right')) { setPal(G.pal + 1); tone(660, 0.04); }
+      if (pressed('up') || pressed('down')) { G.psel = 1 - G.psel; tone(660, 0.03); }
+      if (pressed('left') || pressed('right')) {
+        if (G.psel === 0) setPal(G.pal + (pressed('left') ? -1 : 1)); else toggleMusic();
+        tone(660, 0.04);
+      }
       break;
     case 'lost': G.lostT -= dt; if (G.lostT <= 0) tow(); break;
+    case 'warp':
+      G.warpT += dt;
+      if (G.warpT >= 3.2) { const n = STAGE.n + 1; G.sel = n; buildStage(n); dockAt(0, STAGES[n].intro); }
+      break;
+    case 'ending':
+      if (pressed('start') || pressed('a')) { G.state = 'title'; G.sel = G.unlocked - 1; buildStage(G.sel); }
+      break;
   }
+  playTrack(wantedTrack());
   for (const k of KEYS) PREV[k] = K[k];
 }
 function render() {
@@ -1066,9 +1479,13 @@ function render() {
     case 'flight': renderFlight(); break;
     case 'pause': renderPause(); break;
     case 'lost': renderLost(); break;
+    case 'warp': renderWarp(); break;
+    case 'ending': renderEnding(); break;
   }
   blit();
 }
+
+buildStage(G.sel);
 let last = performance.now(), acc = 0;
 const FRAME = 1 / 30;   // the LCD refreshes at 30 fps on purpose
 function loop(now) {
@@ -1094,6 +1511,6 @@ fit();
 canvas.addEventListener('pointerdown', () => { audioInit(); window.focus(); });
 
 // test hook
-window.OrbitPost = { G, PORTS, update, render, fb };
+window.OrbitPost = { G, STAGES, get STAGE() { return STAGE; }, buildStage, update, render, fb, Music, get AC() { return AC; }, get musicBus() { return musicBus; } };
 })();
 </script>
