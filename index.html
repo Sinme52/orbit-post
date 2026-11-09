@@ -186,7 +186,7 @@ kbd{
     <h2>遊び方</h2>
     <ol>
       <li>ドックで荷物を受け取り、A で発進します。各ステージで3件届けるとクリアし、ワープで次の星系へ進みます。</li>
-      <li>画面の囲みか端の矢印、下のレーダーを頼りに目的地へ向かいます。</li>
+      <li>画面の囲みか端の矢印、下のレーダーを頼りに目的地へ向かいます。惑星や恒星、ブラックホールが間にあるときは、目印が ◇ に変わって回り道を案内します。</li>
       <li>ドックの正面に点滅する誘導灯が並んでいます。速度 25 以下で、扉の中心へまっすぐ入るとドッキング成功です。</li>
       <li>画面上の表示 <span class="hud-words">SLOW DOWN / ALIGN / CENTER / DOCK OK</span> を見ながら寄せてください。</li>
     </ol>
@@ -480,6 +480,8 @@ function buildMire() {
   return { ports: [gate, lamp, well], objects: [rock, ...drift], bodies: [rock, ...drift],
     light: norm([0.3, 0.8, -0.5]), amb: 0.16, fog: { start: 110, end: 560, I: 0.07 }, nebula: neb };
 }
+// dock doors that face along the orbit: launching never points back through the dock or straight at the centre
+const tangent = (p, c = [0, 0, 0]) => norm(cross([0, 1, 0], sub(p, c)));
 function orbitRocks(R, n, rmin, rmax, avoidBands, spread) {
   const out = [];
   while (out.length < n) {
@@ -496,14 +498,14 @@ function buildHelios() {
   const sun = sphereBody(MESH.sun, SUN, 500, 0.05);
   sun.noLight = true;
   const umbra = sphereBody(MESH.umbra, [-2600, 0, 400], 400, 0.02);
-  const ring = stationPort('HELIOS RING', [1250, 60, 0], [1, 0, 0], 0.6);
-  const fp = [300, 0, 900], sp = [-3150, 0, 480];
-  const flare = outpostPort('FLARE LAB', fp, fp);
-  const shade = outpostPort('SHADE POST', sp, sub(sp, umbra.pos));
+  const ring = stationPort('HELIOS RING', [1250, 60, 0], tangent([1250, 60, 0]), 0.6);
+  const fp = [300, 0, 900], sp = [-2600, 0, 1050];   // beside UMBRA, not hidden behind it
+  const flare = outpostPort('FLARE LAB', fp, tangent(fp));
+  const shade = outpostPort('SHADE POST', sp, tangent(sp));
   const R = rng(55);
   const orbiters = orbitRocks(R, 26, 720, 2220, [[1150, 1350], [880, 1030]], 140);
   return { ports: [ring, flare, shade], objects: [sun, umbra, ...orbiters], bodies: [sun, umbra, ...orbiters],
-    point: SUN, amb: 0.06, glow: { obj: sun, k: 1.3, add: 6, I: 0.55 }, heat: { c: SUN, r0: 1150, r1: 600 } };
+    point: SUN, amb: 0.12, glow: { obj: sun, k: 1.3, add: 6, I: 0.55 }, heat: { c: SUN, r0: 1150, r1: 600 } };
 }
 function buildNadir() {
   const C = [0, 0, 0];
@@ -511,9 +513,9 @@ function buildNadir() {
   hole.fatal = true;
   const disk = makeObj(MESH.disk, C, [0, 0, 1], { up: norm([0.3, 1, 0.1]) });
   disk.spinAxis = disk.ay; disk.spinW = 0.25;
-  const a = outpostPort('EDGE POST', [-1600, -300, 1650], [-1600, -300, 1650]);
-  const st = stationPort('NADIR DOCK', [2300, 200, 0], [1, 0, 0], 0.4);
-  const c = outpostPort('LAST LIGHT', [-700, 400, -2200], [-700, 400, -2200]);
+  const a = outpostPort('EDGE POST', [-1600, -300, 1650], tangent([-1600, -300, 1650]));
+  const st = stationPort('NADIR DOCK', [2300, 200, 0], tangent([2300, 200, 0]), 0.4);
+  const c = outpostPort('LAST LIGHT', [-700, 400, -2200], tangent([-700, 400, -2200]));
   const R = rng(77);
   const orbiters = orbitRocks(R, 22, 850, 1700, [], 260);
   return { ports: [st, a, c], objects: [hole, disk, ...orbiters], bodies: [hole, ...orbiters],
@@ -948,7 +950,7 @@ const G = {
   state: 'title', t: 0, blink: 0, pal: 0, musicOn: true, psel: 0,
   ship: { pos: [0,0,0], r: [1,0,0], u: [0,1,0], f: [0,0,1], speed: 0, fuel: 100, hull: 100, pv: 0, yv: 0, rv: 0, drift: [0, 0, 0], lowFuelWarned: false },
   credits: 0, delivered: 0, job: null, port: 0, lastPort: 0, target: 1,
-  stage: 0, sel: 0, unlocked: 1, stageDone: 0, cleared: false, heat: 0, grav: 0, endT: 0, cardT: -1,
+  stage: 0, sel: 0, unlocked: 1, stageDone: 0, cleared: false, heat: 0, grav: 0, endT: 0, cardT: -1, bump: 0,
   msg: '', msgT: 0, shake: 0, lostMsg: '', lostT: 0, dockEvent: [], crateA: 0, warpT: 0,
   dust: [],
 };
@@ -1008,11 +1010,12 @@ function dock(idx) {
 function launch() {
   const P = STAGE.ports[G.port], o = P.obj, s = G.ship;
   const b = basisFrom(o.az);
-  s.pos = add(o.pos, mul(o.az, P.hub[5] + 45));
+  s.pos = add(o.pos, mul(o.az, P.hub[5] + 110));   // far enough out to turn around without clipping the dock
   s.r = b.r; s.u = b.u; s.f = b.f;
   s.speed = 12; s.pv = s.yv = s.rv = 0; s.drift = [0, 0, 0];
   G.target = G.job ? G.job.to : (G.port + 1) % STAGE.ports.length;
-  G.state = 'flight';
+  G.state = 'flight'; G.bump = 0; G.route = null;
+  updateNav(0);
   initDust();
   say('LAUNCH!', 1.2);
   tone(392, 0.06); tone(587, 0.1, 'square', 0.04, 0.06);
@@ -1053,11 +1056,75 @@ function worldTick(dt) {
 
 function toLocal(o, p) { const d = sub(p, o.pos); return [dot(d, o.ax) / o.s, dot(d, o.ay) / o.s, dot(d, o.az) / o.s]; }
 function inBox(l, b, m) { return l[0] > b[0]-m && l[0] < b[3]+m && l[1] > b[1]-m && l[1] < b[4]+m && l[2] > b[2]-m && l[2] < b[5]+m; }
+function deflect(n) {   // turn the nose away from a surface with outward normal n
+  const s = G.ship, fn = dot(s.f, n);
+  if (fn >= 0) return;
+  s.f = norm(sub(s.f, mul(n, 2 * fn)));
+  s.r = norm(cross(s.u, s.f)); s.u = cross(s.f, s.r);
+  s.pv = s.yv = s.rv = 0;
+}
 function hit(dmg, msg) {
   G.ship.hull -= dmg; G.shake = 0.35; say(msg);
   tone(110, 0.18, 'sawtooth', 0.06); tone(70, 0.2, 'square', 0.05, 0.05);
 }
 function doorPoint(P) { return add(P.obj.pos, mul(P.obj.az, P.hub[5] + 1)); }
+function approachPoint(P) { return add(P.obj.pos, mul(P.obj.az, P.hub[5] + 150)); }
+
+// ----- navigation: the on-screen marker leads around planets, the sun's heat, the black hole and docks -----
+function navDangers() {
+  const S = STAGE, out = [];
+  for (const b of S.bodies) if (b.big) out.push([b.pos, b.fatal ? 1000 : b.cr + 120]);
+  if (S.heat) out.push([S.heat.c, S.heat.r0 + 40]);
+  for (const P of S.ports) out.push([P.obj.pos, P.obj.radius + 40]);
+  return out;
+}
+function segBlock(a, b, dangers) {
+  const d = sub(b, a), L2 = Math.max(1e-6, dot(d, d));
+  let best = null;
+  for (const dg of dangers) {
+    const c = dg[0], R = dg[1];
+    const t = clamp(dot(sub(c, a), d) / L2, 0, 1), dist = len(sub(add(a, mul(d, t)), c));
+    const lim = Math.min(R, len(sub(a, c)), len(sub(b, c))) - 20;   // never blocks a leg that starts or ends inside
+    if (dist < lim && (!best || R > best[1])) best = dg;
+  }
+  return best;
+}
+function arcAround(a, b, dg) {
+  const c = dg[0], R = dg[1], u = norm(sub(a, c)), v = norm(sub(b, c));
+  let tg = sub(v, mul(u, dot(u, v)));
+  tg = len(tg) > 1e-3 ? norm(tg) : basisFrom(u).r;
+  const total = Math.acos(clamp(dot(u, v), -1, 1)), n = Math.max(1, Math.ceil(total / 0.6)), rad = R * 1.25;
+  const pts = [];
+  for (let i = 1; i <= n; i++) { const k = total * i / n; pts.push(add(c, mul(add(mul(u, Math.cos(k)), mul(tg, Math.sin(k))), rad))); }
+  return pts;
+}
+function planRoute(from, goal) {
+  const dangers = navDangers(), pts = [goal];
+  for (let iter = 0; iter < 6; iter++) {
+    let start = from, changed = false;
+    for (let i = 0; i < pts.length; i++) {
+      const blk = segBlock(start, pts[i], dangers);
+      if (blk) { pts.splice(i, 0, ...arcAround(start, pts[i], blk)); changed = true; break; }
+      start = pts[i];
+    }
+    if (!changed) break;
+  }
+  return pts;
+}
+function updateNav(dt) {
+  const s = G.ship, P = STAGE.ports[G.target];
+  if (!G.route || G.routeFor !== G.target) { G.route = planRoute(s.pos, approachPoint(P)); G.routeFor = G.target; G.routeT = 0; }
+  while (G.route.length > 1 && len(sub(G.route[0], s.pos)) < 150) G.route.shift();
+  G.routeT += dt;
+  if (G.routeT > 2) {
+    G.routeT = 0;
+    if (segBlock(s.pos, G.route[0], navDangers())) G.route = planRoute(s.pos, approachPoint(P));
+  }
+  const lp = toLocal(P.obj, s.pos);
+  const inFront = lp[2] > P.hub[5] && Math.hypot(lp[0], lp[1]) < 60 + lp[2] * 0.5 && len(sub(P.obj.pos, s.pos)) < 450;
+  G.navFinal = G.route.length === 1 && (inFront || len(sub(G.route[0], s.pos)) < 150);
+  G.nav = G.navFinal ? doorPoint(P) : G.route[0];
+}
 
 function flight(dt) {
   const s = G.ship, S = STAGE;
@@ -1092,7 +1159,9 @@ function flight(dt) {
     s.drift = add(s.drift, mul(d, acc * dt / dl));
     G.grav = clamp(acc / 25, 0, 1);
   }
-  s.drift = mul(s.drift, Math.max(0, 1 - 1.0 * dt));
+  // near a dock its docking field cancels the drift, so the final approach is not pushed off the door
+  const nearDock = S.ports.some(P => len(sub(P.obj.pos, s.pos)) < 350);
+  s.drift = mul(s.drift, Math.max(0, 1 - (nearDock ? 4 : 1) * dt));
 
   const prev = s.pos;
   s.pos = add(add(s.pos, mul(s.f, s.speed * dt)), mul(s.drift, dt));
@@ -1102,9 +1171,14 @@ function flight(dt) {
     const d = sub(s.pos, b.pos), dl = len(d);
     if (dl < b.cr + 3) {
       if (b.fatal) { s.hull = 0; lose('LOST IN THE DARK'); return; }
-      s.pos = add(b.pos, mul(d, (b.cr + 3.5) / (dl || 1)));
-      if (b.big) { hit(30, 'TOO CLOSE!'); s.speed = 0; }
-      else { hit(6 + s.speed * 0.3, 'COLLISION'); s.speed *= 0.25; }
+      s.pos = add(b.pos, mul(d, (b.cr + (b.big ? 25 : 6)) / (dl || 1)));
+      if (b.big) deflect(norm(d));
+      if (G.bump <= 0) {
+        if (b.big) hit(s.speed < 8 ? 3 : 20, 'TOO CLOSE!');
+        else hit(s.speed < 8 ? 1 : 6 + s.speed * 0.3, 'COLLISION');
+        G.bump = 1;
+      }
+      s.speed = b.big ? 0 : s.speed * 0.25;
     }
   }
   // planetary ring: flying inside a ring band grinds the hull
@@ -1142,12 +1216,17 @@ function flight(dt) {
     if (!crash) for (const b of P.boxes) if (inBox(lp, b, 2)) { crash = true; break; }
     if (!crash && P.torus && Math.hypot(Math.hypot(lp[0], lp[1]) - P.torus.R, lp[2]) < P.torus.r + 2) crash = true;
     if (crash) {
-      const dmg = 5 + s.speed * 0.3;
-      s.pos = sub(prev, mul(s.f, 1.5)); s.speed = 0;
-      s.hull -= dmg; G.shake = 0.35; if (G.msgT <= 0 || G.msg === 'LAUNCH!') say('COLLISION');
-      tone(110, 0.18, 'sawtooth', 0.06);
+      if (G.bump <= 0) {
+        s.hull -= s.speed < 8 ? 1 : 5 + s.speed * 0.3; G.bump = 1;
+        G.shake = 0.35; if (G.msgT <= 0 || G.msg === 'LAUNCH!') say('COLLISION');
+        tone(110, 0.18, 'sawtooth', 0.06);
+      }
+      s.pos = add(prev, mul(norm(sub(prev, o.pos)), 3)); s.speed = 0;
+      deflect(norm(sub(prev, o.pos)));
     }
   }
+
+  updateNav(dt);
 
   // space dust wraps around the ship
   for (const p of G.dust) for (let j = 0; j < 3; j++) {
@@ -1200,16 +1279,22 @@ function renderFlight() {
   for (const [dx, dy] of [[-3,0],[-2,0],[2,0],[3,0],[0,-3],[0,-2],[0,2],[0,3]]) pset(80 + dx, 60 + dy, 2);
 
   // nav target
-  const T = S.ports[G.target], tdist = len(sub(T.obj.pos, s.pos));
-  const tp = tdist < 400 ? doorPoint(T) : T.obj.pos;
+  const T = S.ports[G.target];
+  const tp = G.nav || T.obj.pos, isWaypoint = !G.navFinal && G.route && G.route.length > 1;
   const tv = sub(tp, s.pos), lx = dot(tv, s.r), ly = dot(tv, s.u), lz = dot(tv, s.f);
   const q = lz > NEAR ? { x: vp.cx + lx * vp.F / lz, y: vp.cy - ly * vp.F / lz } : null;
   if (q && q.x > 3 && q.x < 157 && q.y > 3 && q.y < VH - 3) {
-    const rr = tdist < 400 ? 12 : T.obj.radius;
-    const sz = Math.round(clamp(rr * vp.F / lz, 3, 34));
-    const c = G.blink ? 3 : 2, x0 = Math.round(q.x - sz), x1 = Math.round(q.x + sz), y0 = Math.round(q.y - sz), y1 = Math.round(q.y + sz);
-    for (const [x, y, sx, sy] of [[x0, y0, 1, 1], [x1, y0, -1, 1], [x0, y1, 1, -1], [x1, y1, -1, -1]]) {
-      for (let i = 0; i < 3; i++) { pset(x + sx * i, y, c); pset(x, y + sy * i, c); }
+    const c = G.blink ? 3 : 2;
+    if (isWaypoint) {   // diamond: a nav waypoint on the way around an obstacle
+      const cx = Math.round(q.x), cy = Math.round(q.y);
+      for (let i = -4; i <= 4; i++) { const k = 4 - Math.abs(i); pset(cx + i, cy - k, c); pset(cx + i, cy + k, c); }
+    } else {
+      const rr = G.navFinal ? 12 : T.obj.radius;
+      const sz = Math.round(clamp(rr * vp.F / lz, 3, 34));
+      const x0 = Math.round(q.x - sz), x1 = Math.round(q.x + sz), y0 = Math.round(q.y - sz), y1 = Math.round(q.y + sz);
+      for (const [x, y, sx, sy] of [[x0, y0, 1, 1], [x1, y0, -1, 1], [x0, y1, 1, -1], [x1, y1, -1, -1]]) {
+        for (let i = 0; i < 3; i++) { pset(x + sx * i, y, c); pset(x, y + sy * i, c); }
+      }
     }
   } else {
     let dx = lx, dy = -ly;
@@ -1223,8 +1308,8 @@ function renderFlight() {
     }
   }
 
-  // docking guide
-  for (const P of S.ports) {
+  // docking guide (only for the dock you are heading to)
+  for (const P of [S.ports[G.target]]) {
     const o = P.obj;
     if (len(sub(o.pos, s.pos)) > 340) continue;
     const lp = toLocal(o, s.pos);
@@ -1271,7 +1356,7 @@ function drawHUD() {
   circle(cx, cy, 9, 1);
   pset(cx, cy, 2);
   const T = STAGE.ports[G.target];
-  const v = norm(sub(T.obj.pos, s.pos));
+  const v = norm(sub(G.nav || T.obj.pos, s.pos));
   const vx = dot(v, s.r), vy = dot(v, s.u), vz = dot(v, s.f);
   const px = Math.round(cx + vx * 8), py = Math.round(cy - vy * 8);
   if (vz >= 0) rect(px - 1, py - 1, 2, 2, 0);
@@ -1507,6 +1592,7 @@ function update(dt) {
   worldTick(dt);
   if (G.msgT > 0) G.msgT -= dt;
   if (G.shake > 0) G.shake -= dt;
+  if (G.bump > 0) G.bump -= dt;
   switch (G.state) {
     case 'title':
       if (pressed('left') && G.sel > 0) { G.sel--; buildStage(G.sel); tone(660, 0.04); }
@@ -1580,6 +1666,6 @@ fit();
 canvas.addEventListener('pointerdown', () => { audioInit(); window.focus(); });
 
 // test hook
-window.OrbitPost = { G, STAGES, get STAGE() { return STAGE; }, buildStage, update, render, fb, Music, get AC() { return AC; }, get musicBus() { return musicBus; } };
+window.OrbitPost = { planRoute, G, STAGES, get STAGE() { return STAGE; }, buildStage, update, render, fb, Music, get AC() { return AC; }, get musicBus() { return musicBus; } };
 })();
 </script>
